@@ -1,0 +1,624 @@
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}	
+
+html {
+  display: block;
+}
+
+body {
+  display: block;
+  margin : 0 auto;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+} 
+
+a:hover { 
+  text-decoration: underline;
+  color: red;
+}
+
+header {
+  display: block;
+  padding: 0;
+  background: wheat;
+  border-bottom: 1px solid #f9ba59;
+  /*position: fixed;*/
+  width: 100%;
+}
+
+.header-wrapper {
+	display: block;
+	width: 80%;
+	margin: 0 auto;
+	height: auto;
+}
+
+.errors-div {
+	border: 2px double red;
+}
+
+.messages-div {
+	border: 2px double blue;
+}
+
+.main-section {
+  background: cornsilk;
+
+}
+
+.main-section-wrapper {
+	display: block;
+	width: 80%;
+	margin: 0 auto;
+}
+
+footer {
+	background: burlywood;
+}
+
+.footer-wrapper {
+	display: block;
+	width: 80%;
+	margin: 0 auto;
+}
+
+.user-info-div {
+
+}
+
+.main-menu {
+	text-align: right;
+}
+
+.main-menu-list {
+	list-style-type: none;
+	text-align: right;	
+}
+
+.main-menu-list > li {
+	display: inline-block;
+	padding: 5px;		
+	border: solid 1px rosybrown;
+	background-color: darkkhaki;
+}
+
+.topics-list-section {
+	border: 4px double black;
+	background: gray;
+}
+
+.topics-list-section-wrapper {
+  display: block;
+	width: 90%;
+	margin: 0 auto;
+}
+
+.topics-list-ops-div {
+	border: solid 1px darkslategray;
+	background: dimgray;
+	text-align: right;
+}
+
+.topics-list-section-header {	
+	border: solid 1px darkslategray;
+	background: dimgray;	
+}
+
+.topics-list-heading {
+	text-align: center;
+}	
+
+.topics-list-section-body {
+	/*background: dimgray;*/
+}
+
+.topics-list {
+	list-style-type: none;
+	padding-inline-start: 0px;
+}
+
+.topics-list-item {
+	border: 1px solid gray;
+}
+
+.topics-list-item:nth-child(odd) {
+	background-color: gainsboro;	
+}
+
+.topics-list-item:nth-child(even) {
+	background-color: silver;	
+}
+
+.topics-list-item#current-item {
+	border: 3px double red;
+}
+
+.topic-header-div {
+	
+}
+
+.topic-header {
+	
+}
+
+.topic-stat-div {
+
+}
+
+.topic-stat-table {
+	text-align: right;
+	border: 1px solid darkslategray;
+}
+
+.topic-date-div {
+
+}
+
+.topic-date {
+	text-align: right;
+	padding: 10px;
+}
+
+.topic-description-div {
+	display: block;
+	width: 90%;
+	margin: 0 auto;
+	background: gray;
+	border: solid 1px darkslategray;
+}
+
+.topic-description {
+	text-align: center;
+}
+
+.topic-item-ops-div {
+	padding: 10px;
+}
+
+.topic-item-ops-list {
+	list-style-type: none;
+	text-align: right;
+}
+
+.topic-item-ops-list > li {
+	display: inline-block;
+	padding: 5px;		
+	border: solid 1px #000000;
+	background-color: #fffff0;
+}
+
+.topics-list-section-footer {	
+	border: solid 1px darkslategray;
+	background: dimgray;	
+}
+
+.topics-list-section-add {	
+	border: solid 1px darkslategray;
+	background: dimgray;	
+}
+
+.topics-add-heading {
+	text-align: center;
+}
+
+.topics-add-div {
+	text-align: center;
+}
+
+.topics-add-text {
+	text-align: left;
+}
+
+
+.topic-description-input {
+	width: 80%;
+}
+
+.topic-description-textarea {
+	width: 80%;
+}
+
+.topics-list-section-add > p {
+	text-align: right;
+}
+
+.topics-list-section-update {	
+	border: solid 1px darkslategray;
+	background: dimgray;	
+}
+
+.topics-update-heading {
+	text-align: center;
+}
+
+.topics-update-div {
+	text-align: center;
+}
+
+.topics-update-text {
+	text-align: left;
+}
+
+.topics-list-section-update > p {
+	text-align: right;
+}
+
+.questions-list-section {
+	align: center;
+}
+
+.questions-list-section-wrapper {
+    display: block;
+	width: 90%;
+	margin: 0 auto;
+}
+
+.questions-list-section-header {
+
+	background: gray;
+	text-align: center;
+}
+
+.questions-list-section-heading {
+
+}
+
+.questions-list-section-body {
+
+	background: gray;
+	text-align: center;
+}
+
+.questions-list-section-div {
+    display: block;
+	width: 95%;
+	margin: 0 auto;
+}
+
+.questions-list-table {
+	border: 1px solid black;
+	width: 100%;
+}
+
+.questions-list-table-header {
+	text-align: center;
+	background: gray;
+}
+
+.questions-list-table-row {
+	text-align: center;
+}
+
+.questions-list-table-row:nth-child(odd) {
+	background: darkgray;
+}
+
+.questions-list-table-row:nth-child(even) {
+	background: silver;
+}
+
+
+.questions-list-item-ops-div {
+	/*background: violet;*/
+}
+
+.question-list-ops-list {
+/*	background: lavender;*/
+}
+
+.question-list-ops-list > li {
+	display: inline-block;
+	padding: 5px;		
+	border: solid 1px darkslategray;
+	background-color: gray;
+}
+
+.questions-list-section-footer {
+	background: gray;
+	text-align: center;
+}
+
+.questions-list-ops-div {
+  text-align: right;
+}
+
+
+.question-list-section-add {
+	/*
+	border:  solid 2px darkslategray;
+	 */
+	margin: 10px;
+}
+
+.question-add-wrapper {
+	display: block;
+	width: 95%;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.question-add-nav-div {
+	text-align: right;
+}
+
+.question-add-form {
+	text-align: center;
+	background: silver;
+	border:  solid 2px darkslategray;
+	margin: 10px;
+	padding: 10px;
+}
+
+.question-add-form-header {
+
+}
+
+.questions-add-form-heading {
+
+}
+
+.question-add-form-body {
+
+}
+
+.question-add-textarea {
+	width: 80%;
+	padding: 10px;
+}
+
+.question-add-form-footer {
+	text-align: right;
+}
+
+.question-update-div {
+	border: solid 2px black;
+	margin: 10px;
+	background: silver;
+}
+
+.question-update-wrapper {
+	display: block;
+	width: 95%;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.question-update-nav-div {
+	text-align: right;
+}
+
+.question-update-form {
+	text-align: center;
+	background: silver;
+	border:  solid 2px darkslategray;
+	margin: 10px;
+	padding: 10px;
+}
+
+.question-update-form-header {
+
+}
+
+.questions-update-form-heading {
+	
+}
+
+.question-update-form-body {
+
+}
+
+.question-update-text {
+	text-align: left;
+}
+
+.question-update-textarea {
+	width: 80%;
+	padding: 10px;
+}
+
+.question-update-form-footer {
+	text-align: right;
+}
+
+.answers-list-section {
+	background: silver;
+	border: solid 2px blue;
+	margin: 10px;	
+}
+
+.answers-list-section-wrapper {
+	display: block;
+	width: 95%;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.answers-list-nav-div {
+	text-align: right;
+}
+
+.answers-list-section-header {
+
+}
+
+.answers-list-section-heading {
+
+} 
+
+.answers-list-section-body {
+
+}
+
+.answers-list-div {
+
+}
+
+.answers-list {
+  border: solid 2px gray;
+}
+
+.answers-list-text {
+	text-align: left;
+}
+
+.answers-list-ops-div {
+	text-align: right;
+}
+
+.answers-list-ops-list > li {
+	display: inline-block;
+	padding: 5px;		
+	border: solid 1px #000000;
+	background-color: #fffff0;
+}
+
+
+.answers-list-section-footer {
+  text-align: right;
+}
+
+.answers-add-ops-div {
+	text-align: right;
+}
+
+.answers-add-div {
+
+}
+
+.answers-add-wrapper {
+
+}
+
+.answers-add-nav-div {
+  text-align: right;
+}
+
+.answer-add-form {
+
+}
+
+.answer-add-form-header {
+
+}
+
+.answer-add-form-heading {
+
+}
+
+.answer-add-form-body {
+
+}
+
+.answer-add-textarea {
+	width: 80%;
+	padding: 10px;
+}
+
+.answer-add-form-footer {
+	text-align: right; 
+}
+
+.answers-update-div {
+	
+}
+
+.answers-update-wrapper {
+	
+}
+
+.answers-update-nav-div {
+	text-align: right;
+}
+
+.answer-update-form {
+
+}
+
+.answer-update-form-header {
+
+}
+
+.answer-update-form-heading {
+
+}
+
+.answer-update-form-body {
+
+}
+
+.answer-update-textarea {
+	width: 80%;
+	padding: 10px;
+}
+
+.answer-update-form-footer {
+	text-align: right;  
+}
+
+.users-list-section {
+	border: 4px double black;
+	background: gray;
+}
+
+.users-list-section-wrapper {
+  display: block;
+	width: 90%;
+	margin: 0 auto;
+}
+
+.users-list-section-header {
+	border: solid 1px darkslategray;
+	background: dimgray;	
+}
+
+.users-list-heading {
+	text-align: center;
+}
+
+.users-list-section-body {
+
+}
+
+.users-list-table {
+	border: 4px double black;
+	width: 100%;
+}
+
+
+.users-list-table-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.user-ops-div {
+	padding: 10px;
+}
+
+.user-ops-list {
+	list-style-type: none;
+	text-align: left;
+}
+
+.user-ops-list > li {
+	display: inline-block;
+	padding: 5px;		
+	border: solid 1px #000000;
+	background-color: #fffff0;
+}
+
+.users-list-section-footer {
+	border: solid 1px darkslategray;
+	background: dimgray;
+}
+
+.users-list-ops-div {
+	border: solid 1px darkslategray;
+	background: dimgray;
+	text-align: right;
+}

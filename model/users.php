@@ -1,73 +1,64 @@
 <?php
 
-class Users
+namespace localhost\model;
+
+//use localhost\controller\PrimaryController;
+
+/**
+ * Class Users
+ * @package localhost\model
+ */
+class Users extends Model
 {
-    /*
-    ------------
-    table users
-    ------------
-    user_id
-    login
-    password
-    type : admin, user, quest
-    mail
-    */
-    private $controller;
-    private $lastPDOError = [];
-
-    function __construct($controller)
+    /**
+     * @param array $params
+     * @return bool
+     */
+    public function add($params)
     {
-        $this -> controller = $controller;
-    }
+        $sth = $this->getDatabase()->prepare('
+            INSERT
+            INTO
+                `users` (`login`, `password`, `type`, `email`)
+            VALUES
+                (:login, :password, :type, :email)
+        ');
+        $sth->bindValue(':login', $params['login'], \PDO::PARAM_STR);
+        $sth->bindValue(':password', $params['password'], \PDO::PARAM_STR);
+        $sth->bindValue(':type', $params['type'], \PDO::PARAM_STR);
+        $sth->bindValue(':email', $params['email'], \PDO::PARAM_STR);
 
-
-    public function getDatabase()
-    {
-        return $this -> controller -> getRouter() -> getDatabase();
-
-    }
-
-    public function getDatabaseError()
-    {
-        return $this -> getDatabase() -> errorInfo();
-    }
-
-    public function getLastPDOError()
-    {
-        return $this -> lastPDOError;
-    }
-
-    function add($params)
-    {
-        $sth = $this -> getDatabase() -> prepare(
-            'INSERT INTO faqusers (login, password, type, mail)'.
-            ' VALUES (:login, :password, :type, :mail)'
-        );
-        $sth -> bindValue(':login', $params['login'], PDO::PARAM_STR);
-        $sth -> bindValue(':password', $params['password'], PDO::PARAM_STR);
-        $sth -> bindValue(':type', $params['type'], PDO::PARAM_STR);
-        $sth -> bindValue(':mail', $params['mail'], PDO::PARAM_STR);
-
-        $result = $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
+        $result = $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-    /*
-	удаление из базы данных
-	*/
-    function delete($id)
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id)
     {
-        $sth = $this -> getDatabase() -> prepare(
-            'DELETE FROM `faqusers` WHERE user_id=:id'
-        );
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        $result = $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
+        $sth = $this->getDatabase()->prepare('
+            DELETE
+            FROM
+                `users`
+            WHERE
+                id=:id
+        ');
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
+        $result = $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-    function update($id, $params)
+    /**
+     * @param int $id
+     * @param array $params
+     * @return bool
+     */
+    public function update($id, $params)
     {
         if (count($params) == 0) {
             return false;
@@ -77,78 +68,123 @@ class Users
             $update[] = $param.'`=:'.$param;
         }
 
-        $sth = $this -> getDatabase() -> prepare(
-            'UPDATE `faqusers` SET `'.implode(', `', $update).' WHERE `user_id`=:id'
-        );
+        $sth = $this->getDatabase()->prepare('
+            UPDATE
+                `users`
+            SET '
+                .implode(', `', $update).'
+            WHERE
+                `id`=:id
+        ');
 
         if (isset($params['login'])) {
-            $sth->bindValue(':login', $params['login'], PDO::PARAM_STR);
+            $sth->bindValue(':login', $params['login'], \PDO::PARAM_STR);
         }
 
         if (isset($params['password'])) {
-            $sth->bindValue(':password', $params['password'], PDO::PARAM_STR);
+            $sth->bindValue(':password', $params['password'], \PDO::PARAM_STR);
         }
 
         if (isset($params['type'])) {
-            $sth->bindValue(':type', $params['type'], PDO::PARAM_STR);
+            $sth->bindValue(':type', $params['type'], \PDO::PARAM_STR);
         }
 
-        if (isset($params['mail'])) {
-            $sth->bindValue(':mail', $params['mail'], PDO::PARAM_STR);
+        if (isset($params['email'])) {
+            $sth->bindValue(':email', $params['email'], \PDO::PARAM_STR);
         }
 
-        $sth->bindValue(':id', $id, PDO::PARAM_INT);
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
 
-        $result = $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
+        $result = $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
 
-    public function getList()
+    /**
+     * @param int $ownerId
+     * @return array
+     */
+    public function getList($ownerId = -1)
     {
-        $sth = $this -> getDatabase() -> prepare(
-            'SELECT `user_id`, `login`, `password`, `type`, `mail` FROM `faqusers`'
-        );
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                `id`, `login`, `password`, `type`, `email`
+            FROM
+                `users`
+        ');
 
-        if ($sth -> execute()) {
-            $result = $sth -> fetchAll();
+        if ($sth->execute()) {
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
         } else {
-            $result = false;
+            $result = [];
         }
-        $this -> lastPDOError = $sth -> errorInfo();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
+    /**
+     * @param int $id
+     * @return array
+     */
     public function getItem($id)
     {
-        $sth = $this -> getDatabase() -> prepare('SELECT `user_id`, `login`, `password`, `type`,  `mail` FROM `faqusers` WHERE `user_id`=:id');
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        $sth -> execute();
-        $result = $sth -> fetch(PDO::FETCH_ASSOC);
-        $this -> lastPDOError = $sth -> errorInfo();
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                `id`, `login`, `password`, `type`, `email`
+            FROM
+                `users`
+            WHERE
+                `id`=:id
+        ');
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
+        $sth->execute();
+        $result = $sth->fetch(\PDO::FETCH_ASSOC);
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
+    /**
+     * @param string $login
+     * @return array
+     */
     public function getUserByLogin($login)
     {
-        $sth = $this -> getDatabase() -> prepare('SELECT `user_id`, `login`, `password`, `type`, `mail` FROM `faqusers` WHERE `login`=:login');
-        $sth -> bindValue(':login', $login, PDO::PARAM_STR);
-        $sth -> execute();
-        $result = $sth -> fetch(PDO::FETCH_ASSOC);
-        $this -> lastPDOError = $sth -> errorInfo();
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                `id`, `login`, `password`, `type`, `email`
+            FROM
+                `users`
+            WHERE
+                `login`=:login
+        ');
+        $sth->bindValue(':login', $login, \PDO::PARAM_STR);
+        $sth->execute();
+        $result = $sth->fetch(\PDO::FETCH_ASSOC);
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-    public function isUserUnique($login, $userId)
+    /**
+     * @param string $login
+     * @param int $id
+     * @return bool
+     */
+    public function isUserUnique($login, $id)
     {
-        $sth = $this -> getDatabase() -> prepare('SELECT COUNT(*) FROM `faqusers` WHERE `login`=:login and `user_id`!=:user_id');
-        $sth -> bindValue(':login', $login, PDO::PARAM_STR);
-        $sth -> bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $sth -> execute();
-        $result = $sth -> fetch(PDO::FETCH_ASSOC);
-        $this -> lastPDOError = $sth -> errorInfo();
-        return ($result['COUNT(*)'] == 0);        
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                COUNT(*)
+            FROM
+                `users`
+            WHERE
+                `login`=:login and `id`!=:id
+         ');
+        $sth->bindValue(':login', $login, \PDO::PARAM_STR);
+        $sth->bindValue(':id', $id, \PDO::PARAM_STR);
+        $sth->execute();
+        $result = $sth->fetch(\PDO::FETCH_ASSOC);
+        $this->lastPDOError = $sth->errorInfo();
+        return ($result['COUNT(*)'] == 0);
     }
-
 }

@@ -1,72 +1,65 @@
 <?php
 
-class Answers
+namespace localhost\model;
+
+//use localhost\controller\PrimaryController;
+
+/**
+ * Class Answers
+ * @package localhost\model
+ */
+class Answers extends Model
 {
-    /*
-    ------------
-    table answers
-    ------------
-    answer_id
-    question_id
-    text
-    date
-    author
-    */
-
-    private $controller;
-    private $lastPDOError = [];
-
-    function __construct($controller)
+    /**
+     * @param array $params
+     * @return bool
+     */
+    public function add($params)
     {
-        $this -> controller = $controller;
-    }
+        $sth = $this->getDatabase()->prepare('
+            INSERT
+            INTO
+                answers (`question_id`, `text`, `author_id`)
+            VALUES
+                (:question_id, :text, :author)
+        ');
 
+        $sth->bindValue(':question_id', $params['question_id'], \PDO::PARAM_INT);
+        $sth->bindValue(':text', $params['text'], \PDO::PARAM_STR);
+        $sth->bindValue(':author', $params['author'], \PDO::PARAM_INT);
 
-    public function getDatabase()
-    {
-        return $this -> controller -> getRouter() -> getDatabase();
-    }
+        $result = $sth->execute();
 
-    public function getDatabaseError()
-    {
-        return $this -> getDatabase() -> errorInfo();
-    }
-
-    public function getLastPDOError()
-    {
-        return $this -> lastPDOError;
-    }
-
-
-    function add($params)
-    {
-        $sth = $this -> getDatabase() -> prepare(
-            'INSERT INTO answers (question_id, text, author)'.
-            ' VALUES (:question_id, :text, :author)'
-        );
-        $sth -> bindValue(':question_id', $params['question_id'], PDO::PARAM_INT);
-        $sth -> bindValue(':text', $params['text'], PDO::PARAM_STR);
-        $sth -> bindValue(':author', $params['author'], PDO::PARAM_INT);
-
-        $result = $sth -> execute();
-
-        $this -> lastPDOError = $sth -> errorInfo();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-
-    function delete($id)
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id)
     {
-        $sth = $this -> getDatabase() -> prepare(
-            'DELETE FROM `answers` WHERE answer_id=:id'
-        );
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        $result = $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
+        $sth = $this->getDatabase()->prepare('
+            DELETE
+            FROM
+                `answers`
+            WHERE
+                id=:id
+        ');
+
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
+        $result = $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-    function update($id, $params)
+    /**
+     * @param int $id
+     * @param array $params
+     * @return bool
+     */
+    public function update($id, $params)
     {
         if (count($params) == 0) {
             return false;
@@ -77,86 +70,118 @@ class Answers
             $update[] = $param.'`=:'.$param;
         }
 
-        $sth = $this -> getDatabase() -> prepare(
-            'UPDATE `answers` SET `'.implode(', `', $update).' WHERE `answer_id`=:id'
-        );
+        $sth = $this->getDatabase()->prepare('
+            UPDATE
+                `answers`
+            SET '
+                .implode(', `', $update).'
+            WHERE
+                `id`=:id
+        ');
 
         if (isset($params['text'])) {
-            $sth->bindValue(':text', $params['text'], PDO::PARAM_STR);
+            $sth->bindValue(':text', $params['text'], \PDO::PARAM_STR);
         }
 
         if (isset($params['author'])) {
-            $sth->bindValue(':author', $params['author'], PDO::PARAM_STR);
+            $sth->bindValue(':author', $params['author'], \PDO::PARAM_STR);
         }
 
-         if (isset($params['question_id'])) {
-            $sth->bindValue(':question_id', $params['question_id'], PDO::PARAM_INT);
-        }       
+        if (isset($params['question_id'])) {
+            $sth->bindValue(':question_id', $params['question_id'], \PDO::PARAM_INT);
+        }
 
-        $sth->bindValue(':id', $id, PDO::PARAM_INT);
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
 
-        $result = $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
+        $result = $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
-
-    public function getList($id)
+    /**
+     * @param int $ownerId
+     * @return array
+     */
+    public function getList($ownerId = -1)
     {
-        $sth = $this -> getDatabase() -> prepare(
+        if ($ownerId == -1) {
+            return [];
+        }
+        $sth = $this->getDatabase()->prepare(
             'SELECT
-                `answer_id`,
+                `answers`.`id`,
                 `question_id`,
                 `text`,
-                `date`,
-                `author`,
+                `created_at`,
+                `author_id`,
                 `login`,
-                `mail`
+                `email`
             FROM
                 `answers`
             INNER JOIN
-                `faqusers`
+                `users`
             ON
-                `author`=`user_id`                                
+                `author_id`=`users`.`id`
             WHERE
                 `question_id`=:id'
         );
 
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        if ($sth -> execute()) {
-            $result = $sth -> fetchAll();
+        $sth->bindValue(':id', $ownerId, \PDO::PARAM_INT);
+        if ($sth->execute()) {
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
         } else {
-            $result = false;
+            $result = [];
         }
-        $this -> lastPDOError = $sth -> errorInfo();
-
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
+    /**
+     * @param int $id
+     * @return array
+     */
     public function getItem($id)
     {
-        $sth = $this -> getDatabase() -> prepare(
-            'SELECT `answer_id`, `question_id`, `text`, `date`, `author` FROM `answers` 
-            WHERE `answer_id`=:id'
-            );
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        $sth -> execute();
-        $result = $sth -> fetch(PDO::FETCH_ASSOC);
-        $this -> lastPDOError = $sth -> errorInfo();
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                `id`,
+                `question_id`,
+                `text`,
+                `created_at`,
+                `author_id`
+            FROM
+                `answers` 
+            WHERE
+                `id`=:id
+        ');
+
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
+        $sth->execute();
+        $result = $sth->fetch(\PDO::FETCH_ASSOC);
+        $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
 
 
+    /**
+     * @param $id
+     * @return int
+     */
     public function getQuestionId($id)
     {
-        $sth = $this -> getDatabase() -> prepare(
-            'SELECT `question_id`'.
-            ' FROM `answers` WHERE `answer_id`=:id'
-            );
-        $sth -> bindValue(':id', $id, PDO::PARAM_INT);
-        $sth -> execute();
-        $this -> lastPDOError = $sth -> errorInfo();
-        $result = $sth -> fetch(PDO::FETCH_ASSOC);
-        return $result['question_id'];        
+        $sth = $this->getDatabase()->prepare('
+            SELECT
+                `question_id`
+            FROM
+                `answers`
+            WHERE
+                `id`=:id
+        ');
+
+        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
+        $sth->execute();
+        $this->lastPDOError = $sth->errorInfo();
+        $result = $sth->fetch(\PDO::FETCH_ASSOC);
+        return $result['question_id'];
     }
 }

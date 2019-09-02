@@ -1,320 +1,335 @@
 <?php
 
-//echo 'UsersController<br/>';
-require_once 'PrimaryController.php';
-include 'model/users.php';
+namespace localhost\controller;
 
+use localhost\classes\Application;
 
+/**
+ * Class UsersController
+ * @package localhost\controller
+ */
 class UsersController extends PrimaryController
 {
-    
-/*    protected $errors = [];
-    private $router;
-*/
-    function __construct($router)
+
+    /**
+     * UsersController constructor.
+     * @param Application $application
+     */
+    public function __construct(Application $application)
     {
-        parent::__construct($router);
-        $this -> intrusionPlaceName = 'user_id';
-        $this -> outputTemplate ='users/list.php';
+        parent::__construct($application);
+        $this->intrusionPlaceName = 'user_id';
+        $this->outputTemplate ='users/list.php';
     }
 
+    /**
+     *
+     */
     protected function initModels()
     {
-        $this -> model = $this -> users;
-        $this -> modelName = 'users';
-        $this -> datasetName = 'users';
-        $this -> itemName = 'user';
+        $this->model = $this->users;
+        $this->modelName = 'users';
+        $this->datasetName = 'users';
+        $this->itemName = 'user';
     }
 
+    /**
+     * @return bool
+     */
     public function getDataset()
     {
-        return $this -> model -> getList();
+        return $this->model->getList();
     }
 
-//////////////////////////////
+    /**
+     * @return null
+     */
     public function getCurrentItem()
     {
-        return $this -> model -> getItem($this -> currentItemID);
+        return $this->model->getItem($this->currentItemID);
     }
 
-
+    /**
+     * @return array
+     */
     public function getEmptyItem()
     {
-        return ['login' => '', 'password' => '', 'mail' => ''];
+        return ['login' => '', 'password' => '', 'email' => ''];
     }
 
-/////////////////////////////
+    /**
+     * @return bool
+     */
     public function setInputData()
     {
         $result = (
-            $this -> getParamLogin('login') &&
-            $this -> isUserUnique() &&
-            $this -> getParamPassword('password') &&
-            $this -> getParamMail('mail') &&
-            $this -> getParamType('type')
+            $this->getParamLogin('login') &&
+            $this->isUserUnique() &&
+            $this->getParamPassword('password') &&
+            $this->getParamMail('email') &&
+            $this->getParamType('type')
         );
-        return $result;      
+        return $result;
     }
 
-
-
+    /**
+     * @param string $name
+     * @return bool
+     */
     public function getParamLogin($name)
     {
         $success = false;
         if (isset($_POST[$name]) && preg_match('/.{5,}/is', $_POST[$name])) {
-            $this -> data[$name] = $_POST[$name];
+            $this->data[$name] = $_POST[$name];
             $success = true;
         } else {
-            $this -> errors[$name] = 'Error in user login';
+            $this->errors[$name] = 'Error in user login';
         }
         return $success;
     }
 
+    /**
+     * @return bool
+     */
     public function isUserUnique()
     {
         $result = false;
-        if (isset($this -> data['login'])) {
-            $result = $this -> model -> isUserUnique($this -> data['login'], $this -> currentItemID);
+        if (isset($this->data['login'])) {
+            $result = $this->model->isUserUnique($this->data['login'], $this->currentItemID);
         } else {
-            $this -> errors['unique'] = 'User with entered login exist';
-        }
-        return $result;    
-    }
-
-    public function getParamMail($name)
-    {
-        $success = false;
-        if (isset($_POST[$name]) && preg_match('/.+@.+\..+/is', $_POST[$name])) {
-            $this -> data[$name] = $_POST[$name];
-            $success = true;
-        } else {
-            $this -> errors[$name] = 'Error in user mail';
-        }
-        return $success;
-    }
-
-
-    public function getParamPassword($name)
-    {
-        $success = false;
-        if (isset($_POST[$name]) && preg_match('/.{5,}/is', $_POST[$name])) {
-            $this -> data[$name] = $_POST[$name];
-            $success = true;
-        } else {
-            $this -> errors[$name] = 'Error in user password';
-        }
-        return $success;
-    }
-
-    public function getParamType($name)
-    {
-        $success = false;
-        if (isset($_POST[$name])) {
-            $this -> data[$name] = $_POST[$name];
-            $success = true;
-        } else {
-            $data[$name] = USER_TYPES['Гость'];
-            $success = true;
-            $this -> messages[$name] = 'Using default user type';
-        }
-        return $success;
-    } 
-
-    public function checkPasswords()
-    {
-        $result = false;
-        if (isset($_POST['password1']) && isset($_POST['password2']) && ($_GET['password1'] === $_GET['password2'])) {
-            $this -> data['password'] = $_POST['password1'];
-            $result = true; 
-        } else {
-            $this -> errors['password'] = 'Error in user password';
+            $this->errors['unique'] = 'User with entered login exist';
         }
         return $result;
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function getParamMail($name)
+    {
+        $success = false;
+        if (isset($_POST[$name]) && preg_match('/.+@.+\..+/is', $_POST[$name])) {
+            $this->data[$name] = $_POST[$name];
+            $success = true;
+        } else {
+            $this->errors[$name] = 'Error in user email';
+        }
+        return $success;
+    }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function getParamPassword($name)
+    {
+        $success = false;
+        if (isset($_POST[$name]) && preg_match('/.{5,}/is', $_POST[$name])) {
+            $this->data[$name] = $_POST[$name];
+            $success = true;
+        } else {
+            $this->errors[$name] = 'Error in user password';
+        }
+        return $success;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function getParamType($name)
+    {
+        if (isset($_POST[$name])) {
+            $this->data[$name] = $_POST[$name];
+            $success = true;
+        } else {
+            $data[$name] = QUEST_CODE;
+            $success = true;
+            $this->messages[$name] = 'Using default user type';
+        }
+        return $success;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkPasswords()
+    {
+        $result = false;
+        if (isset($_POST['password1']) && isset($_POST['password2']) && ($_GET['password1'] === $_GET['password2'])) {
+            $this->data['password'] = $_POST['password1'];
+            $result = true;
+        } else {
+            $this->errors['password'] = 'Error in user password';
+        }
+        return $result;
+    }
+
+    /**
+     * @return bool
+     */
     public function checkUser()
     {
         $success = false;
         if (isset($_SESSION['user']['type']) &&
-            $_SESSION['user']['type'] == USER_TYPES['Администратор']) {
+            $_SESSION['user']['type'] == ADMIN_CODE) {
             $success = true;
-        } 
+        }
         return $success;
     }
 
-/*
-    public function updateItem()
-    {
-        $this -> setCurrentItemId();
-        $block = '';
-        if ($this-> isCurrentItemExist() && $this -> setInputData()) {
-            $isUpdate = $this -> model -> update($this -> currentItemID, $this -> data);
-            if ($isUpdate) {
-                $this -> itemUpdated();
-                $this -> messages['updateItem'] = 'Item updated!';
-//              $this -> getUsersList();
-            } else {
-                $errorInfo = $this -> model -> getLastPDOError()['2'];
-                $this -> errors['updateItem'] = 'Item is not updated. Database Error: ' . $errorInfo;
-                $this -> messages['updateItem'] = 'Item not updated!';
-                $block = $this -> render(
-                    $this -> modelName . '/update.php',
-                    [$this -> itemName => $this -> currentItem]  
-                );
-            }
-        } else {
-
-            $block = $this -> render(
-                $this -> modelName . '/update.php',
-                [$this -> itemName => $this -> currentItem]
-            );
-            $this -> messages['updateItem'] = 'Item not updated!';
-        }
-        
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => $this -> intrusionPlaceValue, 
-            'block' => $block,
-            'type' => $this -> updateItemIntrusionType]
-        );
-    }   
-*/     
-
-
+    /**
+     *
+     */
     public function login()
     {
-        echo '$this -> currentItemID' . $this -> currentItemID . '<br>';
-        if  ($this -> getParamLogin('login') 
-            && $this -> getParamPassword('password')) {
-            
-            $user = $this -> model -> getUserByLogin($this -> data['login']);
-            if ($user['password'] === $this -> data['password']) {
+        $block = '';
+        if ($this->getParamLogin('login') && $this->getParamPassword('password')) {
+            $user = $this->model->getUserByLogin($this->data['login']);
+            if ($user['password'] === $this->data['password']) {
                 $_SESSION['user'] = $user;
                 header('Location: index.php');
             } else {
-                $this -> errors['login'] = 'Password doesn\'t match user password';
-                $block = $this -> render(
-                    $this -> modelName . '/login.php',
-                    [$this -> itemName => $this -> data]
+                $this->errors['login'] = 'Password doesn\'t match user password';
+                $block = $this->render(
+                    $this->modelName . '/login.php',
+                    [$this->itemName => $this->data]
                 );
             }
         } else {
-            $this -> errors['input'] = 'Bad input';
-            $block = $this -> render(
-                $this -> modelName . '/login.php',
-                [$this -> itemName => $this -> data]
+            $this->errors['input'] = 'Bad input';
+            $block = $this->render(
+                $this->modelName . '/login.php',
+                [$this->itemName => $this->data]
             );
         }
-        $this -> outputTemplate ='users/blank.php';
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => '', 
+        $this->outputTemplate ='users/blank.php';
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => '',
             'block' => $block,
             'type' => '']
         );
     }
 
+    /**
+     *
+     */
     public function logout()
     {
         session_destroy();
         header('Location: index.php');
     }
 
-
+    /**
+     *
+     */
     public function register()
     {
         $block = '';
-        if  (
-            $this -> getParamLogin('login') &&  
-            $this -> isUserUnique() &&         
-            $this -> getParamMail('mail') &&
-            $this -> checkPasswords()
+        if ($this->getParamLogin('login') &&
+            $this->isUserUnique() &&
+            $this->getParamMail('email') &&
+            $this->checkPasswords()
         ) {
-            $this -> data['type'] = USER_TYPES['Пользователь'];
+            $this->data['type'] = USER_CODE;
             
-            $isRegistered = $this -> model -> add($this -> data);
+            $isRegistered = $this->model->add($this->data);
             if ($isRegistered) {
-                $this -> userRegistered();
-                $this -> messages['register'] = 'Registration successeful';
-                $block = $this -> render(
-                     $this -> modelName . '/welcome.php',
-                    [$this -> itemName => $this -> data]
+                $this->userRegistered();
+                $this->messages['register'] = 'Registration successful';
+                $block = $this->render(
+                    $this->modelName . '/welcome.php',
+                    [$this->itemName => $this->data]
                 );
             } else {
-                $errorInfo = $this -> model -> getLastPDOError()['2'];
-                $this -> errors['register'] = 'User is not registered. Database Error: ' . $errorInfo;
-                $block = $this -> render(
-                     $this -> modelName . '/register.php',
-                    [$this -> itemName => $this -> data]
+                $errorInfo = $this->model->getLastPDOError()['2'];
+                $this->errors['register'] = 'User is not registered. Database Error: ' . $errorInfo['2'];
+                $block = $this->render(
+                    $this->modelName . '/register.php',
+                    [$this->itemName => $this->data]
                 );
             }
-        } else {                
-            $block = $this -> render(
-                 $this -> modelName . '/register.php',
-                [$this -> itemName => $this -> data]
+        } else {
+            $block = $this->render(
+                $this->modelName . '/register.php',
+                [$this->itemName => $this->data]
             );
         }
-        $this -> outputTemplate ='users/blank.php';
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => '', 
+        $this->outputTemplate ='users/blank.php';
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => '',
             'block' => $block,
             'type' => '']
         );
     }
 
 
+    /**
+     *
+     */
     public function userRegistered()
     {
+    }
 
-    } 
 
-
+    /**
+     *
+     */
     public function welcome()
     {
-        $block = '';
         if (isset($_SESSION['user']['type'])) {
             switch ($_SESSION['user']['type']) {
-                case USER_TYPES['Администратор']:
-                    $block =  $this -> render('users/admin.php');
+                case ADMIN_CODE:
+                    $block = $this->render('users/admin.php');
                     break;
-                case USER_TYPES['Пользователь']:
-                    $block =  $this -> render('topics/list.php');
+                case USER_CODE:
+                    $block = $this->render('topics/list.php');
+                    //$this->router->TopicsController->list();
+                    //$block =  $this->render('users/admin.php');
                     break;
                 default: //'Гость'
-                    $block =  $this -> render('topics/list.php');
+                    $block = $this->render('topics/list.php');
+                    //$block =  $this->render('users/admin.php');
                     break;
             }
         } else {
-            $block =  $this -> render('users/welcome.php');
+            $block = $this->render('users/welcome.php');
         }
-        $this -> outputTemplate ='users/blank.php';
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => '', 
+        $this->outputTemplate ='users/blank.php';
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => '',
             'block' => $block,
             'type' => '']
-        );   
+        );
     }
 
+    /**
+     *
+     */
     public function gotoLogin()
     {
-        $block = $this -> render('users/login.php');        $this -> outputTemplate ='users/blank.php';
-        $this -> outputTemplate ='users/blank.php';
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => '', 
+        $block = $this->render('users/login.php');
+        $this->outputTemplate ='users/blank.php';
+        $this->outputTemplate ='users/blank.php';
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => '',
             'block' => $block,
             'type' => '']
         );
     }
 
+    /**
+     *
+     */
     public function gotoRegister()
     {
-        $block =  $this -> render('users/register.php');
-        $this -> outputTemplate ='users/blank.php';
-        $this -> renderResultPage(
-            [$this -> intrusionPlaceName => '', 
+        $block =  $this->render('users/register.php');
+        $this->outputTemplate ='users/blank.php';
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => '',
             'block' => $block,
             'type' => '']
         );
     }
-    
-
 }

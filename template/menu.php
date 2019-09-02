@@ -1,6 +1,5 @@
-	<div class="main-menu">
-	  <ul class="main-menu-list">
-
+<div class="main-menu">
+  <ul class="main-menu-list">
 
 <?php foreach ($buttons as $button) : ?>
       <li>
@@ -8,5 +7,5 @@
       </li>
 <?php endforeach ?>
 
-	  </ul>
-	</div>
+  </ul>
+</div>

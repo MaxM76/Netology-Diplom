@@ -2,7 +2,7 @@
 
 <html lang="ru">
 
-<?php 
+<?php
     include 'head.php';
     
     include 'body.php';

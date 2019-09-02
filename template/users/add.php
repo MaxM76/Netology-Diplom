@@ -5,13 +5,18 @@
     <td>
       <select name="type">
 <?php foreach (USER_TYPES as $key => $value) : ?>
-    <?php if ($value == '1') { $sel = 'selected ';} else {$sel = '';}?>
+        <?php if ($value == USER_CODE) {
+            $sel = 'selected ';
+        } else {
+            $sel = '';
+        }
+        ?>
         <option <?= $sel ?>value="<?=$value?>"><?=$key?></option>
 <?php endforeach ?>
       </select>
     </td>
 
-    <td><input type="email" name="mail" value=""></td>
+    <td><input type="email" name="email" value=""></td>
     <td>
       <div class="user-ops-div">
         <ul class="user-ops-list">  

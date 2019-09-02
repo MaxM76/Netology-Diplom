@@ -1,7 +1,7 @@
 <div class="user-login-div">
     <h1>Аутентификация</h1>
 
-    <form action="index.php/?c=users&a=login" method="post">
+    <form action="/?c=users&a=login" method="post">
         <!--
         <input type="hidden" name="c" value="users">
         <input type="hidden" name="a" value="login">

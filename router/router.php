@@ -1,156 +1,101 @@
 <?php
 
+namespace localhost\router;
+
+use localhost\classes\Application;
+
+//use localhost\controller\UsersController;
+
 include 'router/consts.php';
 
+/**
+ * Class Router
+ * @package localhost\router
+ */
 class Router
 {
-    private $controller = null; // controller object
-    private $controllerFile = ''; // controller object file
-    public $controllerName = ''; // controller object name
+    /**
+     * Имя объекта контроллера
+     * @var string
+     */
+    public $controllerName = '';
+    /**
+     * Полное имя объекта контроллера
+     * @var string
+     */
+    public $controllerFullName = '';
+
+    /**
+     * @var string
+     */
     public $action = '';
+    /**
+     * @var string
+     */
     public $method = '';
 
-    private $db = null;
-    public $actionsButtons = [];
-    public $userType = USER_TYPES['Гость'];
-
-
-    function __construct()
+    /**
+     * Router constructor.
+     * @param Application $application
+     */
+    public function __construct(Application $application)
     {
-        $this ->  connectDb();
+        $this->application = $application;
     }
 
-    function configDb()
+    /**
+     * Метод считывает информацию о контроллере и запрашиваемом действии
+     */
+    private function read()
     {
-        $config = include 'config.php';
-        return $config;
-    }
-
-    function connectDb()
-    {
-        $config = $this -> configDb();
-        try {
-            $this -> db = new PDO(
-                'mysql:host='.$config['host'].';dbname='.$config['dbname'].';charset=utf8',
-                $config['user'],
-                $config['pass']
-            );
-        } catch (PDOException $e) {
-            die('Database error: '.$e -> getMessage().'<br/>');
-        }
-    }
-
-
-    function getDatabase()
-    {
-        return $this -> db;
-    }
-
-    function checkUser()
-    {
-        if (isset($_SESSION['user']['type'])) {
-            $this -> userType = $_SESSION['user']['type'];
-        } 
-    }
-
-    function read()
-    {
-        /*
-        print_r($_SERVER['REQUEST_URI']);
-
-        echo '<br>';
-         $_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'].'#current-topic';
-        print_r($_SERVER['REQUEST_URI']);
-
-        echo '<br>';
-        */        
-        if (! isset($_GET['c']) || ! isset($_GET['a'])) {
-            $this -> controllerName = 'users' . 'Controller';
-            $this -> action = 'default';
-            //echo 'default controller<br/>';
+        if (!isset($_GET['c']) || !isset($_GET['a'])) {
+            $this->controllerName = 'users' . 'Controller';
+            $this->action = 'default';
         } else {
-            $this -> controllerName = $_GET['c'] . 'Controller';
-            $this -> action = $_GET['a'];
-            //echo 'not default controller<br/>';
+            $this->controllerName = $_GET['c'] . 'Controller';
+            $this->action = $_GET['a'];
         }
+    }
 
-        switch ($this -> controllerName) {
+    /**
+     * Метод устанавливает имя метода контроллера в соответствии с запрашиваемым действием
+     */
+    private function setMethod()
+    {
+        switch ($this->controllerName) {
             case "usersController":
-                $this -> method = USERS_METHODS[$this -> action];
-                //$_SESSION['user']['type'] == USER_TYPES['Администратор'])
+                $this->method = USERS_METHODS[$this->action];
+                //$_SESSION['user']['type'] == USER_TYPES[ADMIN_STR])
                 break;
             case "topicsController":
-                $this -> method = TOPICS_METHODS[$this -> action][$this -> userType];
+                $this->method = TOPICS_METHODS[$this->action][$this->application->userType];
                 break;
             case "questionsController":
-                $this -> method = QUESTIONS_METHODS[$this -> action][$this -> userType];
+                $this->method = QUESTIONS_METHODS[$this->action][$this->application->userType];
                 break;
             case "answersController":
-                $this -> method = ANSWERS_METHODS[$this -> action][$this -> userType];
+                $this->method = ANSWERS_METHODS[$this->action][$this->application->userType];
                 break;
         }
     }
 
-
-    function initActionButtons()
+    /**
+     * Метод устанавливает полное имя контроллера в соответствии с запросом
+     */
+    private function setController()
     {
-        switch ($this -> userType) {
-            case USER_TYPES['Администратор']:
-                $this -> actionButtons = 
-                    ['gotoStartPage', 'manageUsers', 'manageContent', 'logout'];
-                break;
-            case USER_TYPES['Пользователь']:
-                $this -> actionButtons = 
-                    ['gotoStartPage', 'logout', 'explore'];
-                break;
-            case USER_TYPES['Гость']:
-                $this -> actionButtons = 
-                    ['gotoStartPage', 'login', 'register', 'explore'];
-                break;
-        }
+        $this->controllerFullName = '\localhost\controller\\'.$this->controllerName;
     }
 
-    function addActionButton($actionButton)
+    /**
+     * Главный метод роутера.
+     *
+     * Установка имени объекта контроллера и вызаваемого метода контроллера
+     */
+    public function init()
     {
-        if (!(in_array($actionButton, $this -> actionButtons))) {
-            $this -> actionButtons[] = $actionButton;
-        }    
+        $this->read();
+        $this->setMethod();
+        $this->setController();
     }
-
-    function removeActionButton($actionButton)
-    {
-        $position = array_search($actionButton, $this -> actionButtons);
-        if (!$position) {
-            unset($this -> actionButtons[$position]);       
-        }
-    }
-
-    function createController()
-    {
-        $controllerName = $this -> controllerName;
-        if (class_exists($controllerName)) {
-            $this -> controller = new $controllerName($this); // создает объект-контроллер            
-        }
-    }
-
-    function run()
-    {
-        if (method_exists($this -> controller, $this -> method)) {
-            $method = $this -> method;
-            $this -> controller -> $method(); // вызывает метод объекта-контроллера
-        }
-    }
-    
 }
-
-include 'controller/UsersController.php';
-include 'controller/TopicsController.php';
-include 'controller/QuestionsController.php';
-include 'controller/AnswersController.php';
-
-$r = new Router;
-$r -> checkUser();
-$r -> read();
-$r -> createController();
-$r -> initActionButtons();
-$r -> run();

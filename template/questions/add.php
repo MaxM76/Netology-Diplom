@@ -14,11 +14,11 @@
       <div class="question-add-form-body">
         <textarea class="question-add-textarea" rows="10" name="text"></textarea>
 
-<?php if (!(isset($_SESSION['user']['mail']))):?>
+<?php if (!(isset($_SESSION['user']['email']))) : ?>
         <p>Имя:</p>
         <p><input type="text" name="login" value=""></p>
         <p>Электронная почта:</p>
-        <p><input type="email" name="mail" value=""></p>        
+        <p><input type="email" name="email" value=""></p>
 <?php endif; ?>    
 
       </div>

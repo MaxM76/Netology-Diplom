@@ -13,18 +13,29 @@
         <p class="question-update-text">Текст вопроса:</p>
         <textarea class="question-update-textarea" rows="10" name="text"><?= $question['text']?></textarea>
         
-<?php if ($question['published'] == 1) { $ch ='checked ';} else {$ch ='';}?>
-        <p class="question-update-text"><input type="checkbox" name="published" <?= $ch ?>value="true">Опубликовать</p>            
+<?php if ($question['is_published'] == 1) {
+    $ch ='checked ';
+} else {
+    $ch ='';
+}?>
+        <p class="question-update-text">
+          <input type="checkbox" name="published" <?= $ch ?>value="true">Опубликовать
+        </p>
 
         <p class="question-update-text">Переместить в  категорию:
-            <select name="topic_id">
+          <select name="topic_id">
 <?php foreach ($topics as $item) : ?>
-    <?php if ($topic['topic_id'] === $item['topic_id']) { $sel = 'selected ';} else {$sel = '';}?>
-                <option <?= $sel ?>value="<?=$item['topic_id']?>"><?=$item['text']?></option>
+    <?php if ($topic['topic_id'] === $item['topic_id']) {
+        $sel = 'selected ';
+    } else {
+        $sel = '';
+    }?>
+            <option <?= $sel ?>value="<?=$item['topic_id']?>"><?=$item['text']?></option>
 <?php endforeach ?>
-            </select>
+          </select>
         </p>
-      </div> 
+      </div>
+
       <div class="question-update-form-footer">
         <input type="submit" value="Изменить">  
       </div>

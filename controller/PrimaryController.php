@@ -1,10 +1,10 @@
 <?php
 
-namespace localhost\controller;
+namespace lh\controller;
 
-use localhost\classes\Application;
-use localhost\model\Model;
-use localhost\model\Users;
+use lh\classes\Application;
+use lh\model\Model;
+use lh\model\Users;
 
 class PrimaryController
 {

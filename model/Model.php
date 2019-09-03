@@ -6,13 +6,13 @@
  * Time: 21:25
  */
 
-namespace localhost\model;
+namespace lh\model;
 
-use localhost\controller\PrimaryController;
+use lh\controller\PrimaryController;
 
 /**
  * Class Model
- * @package localhost\model
+ * @package lh\model
  */
 class Model
 {

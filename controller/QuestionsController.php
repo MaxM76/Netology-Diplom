@@ -1,18 +1,18 @@
 <?php
 
-namespace localhost\controller;
+namespace lh\controller;
 
-//use localhost\controller\PrimaryController;
-use localhost\classes\Application;
-use localhost\model\Questions;
-use localhost\model\Topics;
+//use lh\controller\PrimaryController;
+use lh\classes\Application;
+use lh\model\Questions;
+use lh\model\Topics;
 
 //require_once 'PrimaryController.php';
 //include 'model/questions.php';
 
 /**
  * Class QuestionsController
- * @package localhost\controller
+ * @package lh\controller
  */
 class QuestionsController extends TopicsController
 {

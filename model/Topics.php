@@ -1,10 +1,10 @@
 <?php
 
-namespace localhost\model;
+namespace lh\model;
 
 /**
  * Class Topics
- * @package localhost\model
+ * @package lh\model
  */
 class Topics extends Model
 {

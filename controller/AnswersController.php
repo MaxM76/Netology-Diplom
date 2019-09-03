@@ -1,15 +1,15 @@
 <?php
 
-namespace localhost\controller;
+namespace lh\controller;
 
-use localhost\classes\Application;
-use localhost\model\Answers;
-use localhost\model\Questions;
-use localhost\model\Topics;
+use lh\classes\Application;
+use lh\model\Answers;
+use lh\model\Questions;
+use lh\model\Topics;
 
 /**
  * Class AnswersController
- * @package localhost\controller
+ * @package lh\controller
  */
 class AnswersController extends TopicsController
 {

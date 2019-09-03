@@ -1,16 +1,12 @@
 <?php
 
-namespace localhost\router;
+namespace lh\classes;
 
-use localhost\classes\Application;
-
-//use localhost\controller\UsersController;
-
-include 'router/consts.php';
+include 'Consts/consts.php';
 
 /**
  * Class Router
- * @package localhost\router
+ * @package lh\classes
  */
 class Router
 {
@@ -49,10 +45,10 @@ class Router
     private function read()
     {
         if (!isset($_GET['c']) || !isset($_GET['a'])) {
-            $this->controllerName = 'users' . 'Controller';
+            $this->controllerName = 'Users' . 'Controller';
             $this->action = 'default';
         } else {
-            $this->controllerName = $_GET['c'] . 'Controller';
+            $this->controllerName = ucfirst($_GET['c']) . 'Controller';
             $this->action = $_GET['a'];
         }
     }
@@ -63,17 +59,17 @@ class Router
     private function setMethod()
     {
         switch ($this->controllerName) {
-            case "usersController":
+            case "UsersController":
                 $this->method = USERS_METHODS[$this->action];
                 //$_SESSION['user']['type'] == USER_TYPES[ADMIN_STR])
                 break;
-            case "topicsController":
+            case "TopicsController":
                 $this->method = TOPICS_METHODS[$this->action][$this->application->userType];
                 break;
-            case "questionsController":
+            case "QuestionsController":
                 $this->method = QUESTIONS_METHODS[$this->action][$this->application->userType];
                 break;
-            case "answersController":
+            case "AnswersController":
                 $this->method = ANSWERS_METHODS[$this->action][$this->application->userType];
                 break;
         }
@@ -84,7 +80,7 @@ class Router
      */
     private function setController()
     {
-        $this->controllerFullName = '\localhost\controller\\'.$this->controllerName;
+        $this->controllerFullName = '\lh\controller\\'.$this->controllerName;
     }
 
     /**

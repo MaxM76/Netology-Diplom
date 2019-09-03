@@ -1,12 +1,12 @@
 <?php
 
-namespace localhost\model;
+namespace lh\model;
 
-//use localhost\controller\PrimaryController;
+//use lh\controller\PrimaryController;
 
 /**
  * Class Questions
- * @package localhost\model
+ * @package lh\model
  */
 class Questions extends Model
 {

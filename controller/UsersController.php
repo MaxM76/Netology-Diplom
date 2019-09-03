@@ -1,12 +1,12 @@
 <?php
 
-namespace localhost\controller;
+namespace lh\controller;
 
-use localhost\classes\Application;
+use lh\classes\Application;
 
 /**
  * Class UsersController
- * @package localhost\controller
+ * @package lh\controller
  */
 class UsersController extends PrimaryController
 {

@@ -6,15 +6,14 @@
  * Time: 15:21
  */
 
-namespace localhost\classes;
+namespace lh\classes;
 
-use localhost\controller\PrimaryController;
-use localhost\router\Router;
-use localhost\controller\UsersController;
+use lh\controller\PrimaryController;
+use lh\controller\UsersController;
 
 /**
  * Class Application
- * @package localhost\classes
+ * @package lh\classes
  */
 class Application
 {

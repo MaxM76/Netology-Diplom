@@ -1,6 +1,6 @@
 <?php
 
-    //namespace localhost\router;
+    //namespace lh\router;
 
     const ADMIN_STR = 'Администратор';
     const USER_STR = 'Пользователь';

@@ -1,13 +1,13 @@
 <?php
 
-namespace localhost\controller;
+namespace lh\controller;
 
-use localhost\model\Topics;
-use localhost\classes\Application;
+use lh\model\Topics;
+use lh\classes\Application;
 
 /**
  * Class TopicsController
- * @package localhost\controller
+ * @package lh\controller
  */
 class TopicsController extends PrimaryController
 {

@@ -60,23 +60,6 @@ class Topics extends Model
      */
     public function deleteQuestionsOfTopic($topicId)
     {
-/*        $sth = $this->getDatabase()->prepare('
-            SELECT
-                COUNT(*) AS `total`
-            FROM
-                `questions`
-            WHERE
-                `id`=:id
-        ');
-        $sth->bindValue(':id', $topicId, \PDO::PARAM_INT);
-
-        if ($sth->execute()) {
-            $result = $sth->fetch(\PDO::FETCH_ASSOC);
-        } else {
-            $this->lastPDOError = $sth->errorInfo();
-            return false;
-        }
-*/
         if ($this->getQuestionsCount($topicId) == 0) {
             return true;
         }
@@ -163,23 +146,6 @@ class Topics extends Model
      */
     public function deleteAnswersOfQuestion($id)
     {
-/*        $sth = $this->getDatabase()->prepare('
-            SELECT
-                COUNT(*) AS `total`
-            FROM
-                `answers`
-            WHERE
-                `question_id`=:id
-        ');
-
-        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
-        if ($sth->execute()) {
-            $result = $sth->fetch(\PDO::FETCH_ASSOC);
-        } else {
-            $this->lastPDOError = $sth->errorInfo();
-            return false;
-        }
-*/
         if ($this->getAnswersCount($id) == 0) {
             return true;
         }
@@ -222,7 +188,6 @@ class Topics extends Model
         return $result;
     }
 
-
     /**
      * @param int $id
      * @param array $params
@@ -241,7 +206,7 @@ class Topics extends Model
         $sth = $this->getDatabase()->prepare('
             UPDATE
                 `topics`
-            SET '
+            SET `'
                 .implode(', `', $update).'
             WHERE
                 `id`=:id
@@ -266,7 +231,7 @@ class Topics extends Model
      * @param int $ownerId
      * @return array
      */
-    public function getList($ownerId = -1)
+    public function getList($ownerId = UNKNOWN_ITEM_ID)
     {
         $sth = $this->getDatabase()->prepare('
             SELECT
@@ -315,7 +280,6 @@ class Topics extends Model
         ');
 
         if ($sth->execute()) {
-            //array_splice($result, 0, 0, $sth->fetchAll(\PDO::FETCH_ASSOC));
             $result = array_merge($result, $sth->fetchAll(\PDO::FETCH_ASSOC));
         } else {
             $result = [];

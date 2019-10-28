@@ -27,7 +27,6 @@ class Answers extends Model
         $sth->bindValue(':author', $params['author'], \PDO::PARAM_INT);
 
         $result = $sth->execute();
-
         $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
@@ -100,9 +99,9 @@ class Answers extends Model
      * @param int $ownerId
      * @return array
      */
-    public function getList($ownerId = -1)
+    public function getList($ownerId = UNKNOWN_ITEM_ID)
     {
-        if ($ownerId == -1) {
+        if ($ownerId == UNKNOWN_ITEM_ID) {
             return [];
         }
         $sth = $this->getDatabase()->prepare(
@@ -159,7 +158,6 @@ class Answers extends Model
         $this->lastPDOError = $sth->errorInfo();
         return $result;
     }
-
 
     /**
      * @param $id

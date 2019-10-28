@@ -2,7 +2,7 @@
 
 namespace lh\classes;
 
-include 'Consts/consts.php';
+//include 'Consts/consts.php';
 
 /**
  * Class Router
@@ -60,8 +60,7 @@ class Router
     {
         switch ($this->controllerName) {
             case "UsersController":
-                $this->method = USERS_METHODS[$this->action];
-                //$_SESSION['user']['type'] == USER_TYPES[ADMIN_STR])
+                $this->method = USERS_METHODS[$this->action][$this->application->userType];
                 break;
             case "TopicsController":
                 $this->method = TOPICS_METHODS[$this->action][$this->application->userType];

@@ -21,14 +21,14 @@ class Questions extends Model
             INTO
                 `questions` (`text`, `topic_id`, `author_id`, `status`, `is_published`)
             VALUES
-                (:text, :topic_id, :author, :status, :published)
+                (:text, :topic_id, :author, :status, :is_published)
         ');
 
         $sth->bindValue(':text', $params['text'], \PDO::PARAM_STR);
         $sth->bindValue(':topic_id', $params['topic_id'], \PDO::PARAM_INT);
         $sth->bindValue(':author', $params['author'], \PDO::PARAM_INT);
         $sth->bindValue(':status', $params['status'], \PDO::PARAM_INT);
-        $sth->bindValue(':published', QUESTION_NOT_PUBLISHED, \PDO::PARAM_INT);
+        $sth->bindValue(':is_published', QUESTION_NOT_PUBLISHED, \PDO::PARAM_INT);
 
         $result = $sth->execute();
         $this->lastPDOError = $sth->errorInfo();
@@ -66,23 +66,6 @@ class Questions extends Model
      */
     public function deleteAnswersOfQuestion($id)
     {
-/*        $sth = $this->getDatabase()->prepare('
-            SELECT
-                COUNT(*) AS `total`
-            FROM
-                `answers`
-            WHERE
-                `question_id`=:id
-        ');
-
-        $sth->bindValue(':id', $id, \PDO::PARAM_INT);
-        if ($sth->execute()) {
-            $result = $sth->fetch(\PDO::FETCH_ASSOC);
-        } else {
-            $this->lastPDOError = $sth->errorInfo();
-            return false;
-        }
-*/
         if ($this->getAnswersCount($id) == 0) {
             return true;
         }
@@ -180,17 +163,23 @@ class Questions extends Model
     {
         $sth = $this->getDatabase()->prepare('
             SELECT
-                `id`,
+                `questions`.`id`,
                 `text`,
                 `topic_id`,
                 `created_at`,
                 `author_id`,
+                `login`,
+                `email`,                
                 `status`,
                 `is_published`
             FROM
                 `questions`
+            INNER JOIN
+                `users`
+            ON
+                `author_id`=`users`.`id`            
             WHERE
-                `id`=:id
+                `questions`.`id`=:id
         ');
 
         $sth->bindValue(':id', $id, \PDO::PARAM_INT);
@@ -204,9 +193,9 @@ class Questions extends Model
      * @param int $ownerId
      * @return array
      */
-    public function getList($ownerId = -1)
+    public function getList($ownerId = UNKNOWN_ITEM_ID)
     {
-        if ($ownerId == -1) {
+        if ($ownerId == UNKNOWN_ITEM_ID) {
             return [];
         }
         $sth = $this->getDatabase()->prepare('
@@ -267,7 +256,6 @@ class Questions extends Model
                 `topic_id`=:id AND `is_published`= true
             ');
 
-
         $sth->bindValue(':id', $topicId, \PDO::PARAM_INT);
         if ($sth->execute()) {
             $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
@@ -304,7 +292,6 @@ class Questions extends Model
             WHERE
                 `topic_id`=:id AND `is_published`= false
             ');
-
 
         $sth->bindValue(':id', $topicId, \PDO::PARAM_INT);
         if ($sth->execute()) {
@@ -343,7 +330,6 @@ class Questions extends Model
                 `topic_id`=:id AND `status`= false
             ');
 
-
         $sth->bindValue(':id', $topicId, \PDO::PARAM_INT);
         if ($sth->execute()) {
             $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
@@ -375,7 +361,6 @@ class Questions extends Model
         $result = $sth->fetch(\PDO::FETCH_ASSOC);
         return $result['topic_id'];
     }
-
 
     /**
      * @param int $id

@@ -71,7 +71,7 @@ class Users extends Model
         $sth = $this->getDatabase()->prepare('
             UPDATE
                 `users`
-            SET '
+            SET `'
                 .implode(', `', $update).'
             WHERE
                 `id`=:id
@@ -105,7 +105,7 @@ class Users extends Model
      * @param int $ownerId
      * @return array
      */
-    public function getList($ownerId = -1)
+    public function getList($ownerId = UNKNOWN_ITEM_ID)
     {
         $sth = $this->getDatabase()->prepare('
             SELECT

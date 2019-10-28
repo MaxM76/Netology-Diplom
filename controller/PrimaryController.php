@@ -76,7 +76,7 @@ class PrimaryController
     /**
      * @var int
      */
-    protected $currentItemID = -1;
+    protected $currentItemID = UNKNOWN_ITEM_ID;
 
     /**
      * @var string
@@ -86,7 +86,7 @@ class PrimaryController
     /**
      * @var int
      */
-    protected $intrusionPlaceValue = -1;
+    protected $intrusionPlaceValue = UNKNOWN_ITEM_ID;
 
     /**
      * @var array
@@ -118,7 +118,7 @@ class PrimaryController
         $this->users = new Users($this);
         $this->initModels();
         $this->setCurrentItemId();
-
+        $this->setFilter();
         $this->addItemIntrusionType = 'replace';
         $this->updateItemIntrusionType = 'replace';
         $this->getItemIntrusionType = 'replace';
@@ -141,17 +141,33 @@ class PrimaryController
     }
 
     /**
+     *
+     */
+    public function getFilter()
+    {
+        return (isset($_SESSION['filter'])) ? $_SESSION['filter'] : PUBLISHED_QUESTIONS;
+    }
+
+    /**
+     *
+     */
+    protected function setFilter()
+    {
+        if (isset($_GET['filter']) && isset($_SESSION['user']['type']) && $_SESSION['user']['type'] != QUEST_CODE) {
+            $_SESSION['filter'] = $_GET['filter'];
+        }
+    }
+
+    /**
      * @param string $template
      * @param array $params
      * @return string
      */
-    public function render($template, $params = [])
+    protected function render($template, $params = [])
     {
         $result = '';
         $fileTemplate = 'template/'. $template;
         if (is_file($fileTemplate)) {
-            $params = $params + ['controller' => $this->application->router->controllerName];
-            $params = $params + ['action' => $this->application->router->action];
             $params = $params + ['userType' => $this->application->userType];
             ob_start();
             if (count($params) > 0) {
@@ -166,7 +182,7 @@ class PrimaryController
     /**
      *
      */
-    public function renderErrorsBlock()
+    protected function renderErrorsBlock()
     {
         $this->errorsBlock = $this->render('errors.php', ['errors' => $this->errors]);
     }
@@ -174,7 +190,7 @@ class PrimaryController
     /**
      *
      */
-    public function renderMessagesBlock()
+    protected function renderMessagesBlock()
     {
         $this->messagesBlock = $this->render('messages.php', ['messages' => $this->messages]);
     }
@@ -207,14 +223,14 @@ class PrimaryController
      * @param string $name
      * @return bool
      */
-    public function getParamSimple($name)
+    protected function getParamSimple($name)
     {
         $success = false;
         if (isset($_GET[$name])) {
             $this->data[$name] = $_GET[$name];
             $success = true;
         } else {
-            $this->errors[$name] = 'Error in getting ' . $name;
+            $this->errors[__METHOD__] = GETTING_VALUE_ERR_MSG . $name;
         }
         return $success;
     }
@@ -223,14 +239,14 @@ class PrimaryController
      * @param string $name
      * @return bool
      */
-    public function getParamNumeric($name)
+    protected function getParamNumeric($name)
     {
         $success = false;
         if (isset($_GET[$name]) && is_numeric($_GET[$name])) {
             $this->data[$name] = $_GET[$name];
             $success = true;
         } else {
-            $this->errors[$name] = 'Error in getting ' . $name;
+            $this->errors[__METHOD__] = GETTING_VALUE_ERR_MSG . $name;
         }
         return $success;
     }
@@ -239,18 +255,32 @@ class PrimaryController
      * @param string $name
      * @return bool
      */
-    public function getParamLogical($name)
+    protected function getParamLogical($name)
     {
         $this->data[$name] = false;
-        $success = true;
-        $this->messages[$name] = 'Using default value for ' . $name;
-        return $success;
+        if (isset($_GET[$name])) {
+            $input = $_GET[$name];
+            if (is_bool($input)) {
+                $this->data[$name] = $input;
+                return true;
+            } else {
+                if (($input == 1) || ($input == 'on')) {
+                    $this->data[$name] = true;
+                    return true;
+                } elseif (($input == 0)) {
+                    return true;
+                }
+            }
+        } else {
+            $this->messages[__METHOD__] = ITEM_DEFAULT_VALUE_MSG . $name;
+            return true;
+        }
     }
 
     /**
      * @param array $intrusion
      */
-    public function renderOutputBlock($intrusion = [])
+    private function renderOutputBlock($intrusion = [])
     {
         $this->outputBlock = $this->render(
             $this->outputTemplate,
@@ -262,7 +292,7 @@ class PrimaryController
     /**
      * @return null
      */
-    public function getDataset()
+    protected function getDataset()
     {
         return null;
     }
@@ -270,7 +300,7 @@ class PrimaryController
     /**
      * @return bool
      */
-    public function checkUser()
+    protected function checkUser()
     {
         $success = false;
         if (isset($_SESSION['user']['email'])) {
@@ -287,9 +317,9 @@ class PrimaryController
      */
     public function renderResultPage($intrusion = [])
     {
-        $this->renderOutputBlock($intrusion); // setting $this->outputBlock
-        $this->renderErrorsBlock(); // setting $this->errorsBlock
-        $this->renderMessagesBlock(); // setting $this->messagesBlock
+        $this->renderOutputBlock($intrusion);
+        $this->renderErrorsBlock();
+        $this->renderMessagesBlock();
         echo $this->render(
             'html.php',
             [
@@ -304,7 +334,7 @@ class PrimaryController
     /**
      * @return bool
      */
-    public function setCurrentItemId()
+    protected function setCurrentItemId()
     {
         $result = false;
         if ((count($_GET) > 0) && isset($_GET['id']) && is_numeric($_GET['id'])) {
@@ -318,7 +348,7 @@ class PrimaryController
     /**
      * @param int $value
      */
-    public function setIntrusionPlaceValue($value = -1)
+    protected function setIntrusionPlaceValue($value = UNKNOWN_ITEM_ID)
     {
         $this->intrusionPlaceValue = $value;
     }
@@ -326,7 +356,7 @@ class PrimaryController
     /**
      * @return bool
      */
-    public function isCurrentItemExist()
+    protected function isCurrentItemExist()
     {
         $result = false;
         if ($this->currentItemID > 0) {
@@ -344,15 +374,16 @@ class PrimaryController
             $isDelete = $this->model->delete($this->currentItemID);
             if ($isDelete) {
                 $this->itemDeleted();
-                $this->messages['deleteItem'] = 'Item deleted';
-                $this->currentItemID = -1;
+                $this->messages[__METHOD__] = ITEM_DELETE_SUCCESS_MSG;
+                $this->currentItemID = UNKNOWN_ITEM_ID;
             } else {
-                $errorInfo = $this->model->getLastPDOError()['2'];
-                $this->errors['deleteItem'] = 'Item not deleted. Database Error: ' . $errorInfo['2'];
-                $this->messages['deleteItem'] = 'Item not deleted';
+                $errorInfo = $this->model->getLastPDOError();
+                $this->errors[__METHOD__] =
+                    ITEM_DELETE_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
+                $this->messages[__METHOD__] = ITEM_DELETE_FAILURE_MSG;
             }
         } else {
-            $this->messages['deleteItem'] = 'Item not deleted';
+            $this->messages[__METHOD__] = ITEM_DELETE_FAILURE_MSG;
         }
         $this->renderResultPage();
     }
@@ -368,7 +399,7 @@ class PrimaryController
     /**
      * @return null
      */
-    public function getEmptyItem()
+    protected function getEmptyItem()
     {
         return null;
     }
@@ -399,7 +430,7 @@ class PrimaryController
     /**
      * @return bool
      */
-    public function setInputData()
+    protected function setInputData()
     {
         $success = false;
         return $success;
@@ -415,11 +446,12 @@ class PrimaryController
             $isAdded = $this->model->add($this->data);
             if ($isAdded) {
                 $this->itemAdded();
-                $this->messages['addItem'] = 'Item added!';
+                $this->messages[__METHOD__] = ITEM_ADD_SUCCESS_MSG;
             } else {
-                $errorInfo = $this->model->getLastPDOError()['2'];
-                $this->errors['addItem'] = 'Item not added. Database Error: ' . $errorInfo['2'];
-                $this->messages['addItem'] = 'Item not added';
+                $errorInfo = $this->model->getLastPDOError();
+                $this->errors[__METHOD__] =
+                    ITEM_ADD_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
+                $this->messages[__METHOD__] = ITEM_ADD_FAILURE_MSG;
                 $block = $this->render(
                     $this->modelName . '/add.php',
                     [$this->itemName => $this->getEmptyItem()]
@@ -430,7 +462,7 @@ class PrimaryController
                 $this->modelName . '/add.php',
                 [$this->itemName => $this->getEmptyItem()]
             );
-            $this->messages['addItem'] = 'Item not added';
+            $this->messages[__METHOD__] = ITEM_ADD_FAILURE_MSG;
         }
         $this->renderResultPage(
             [$this->intrusionPlaceName => $this->intrusionPlaceValue,
@@ -449,22 +481,24 @@ class PrimaryController
             $isUpdate = $this->model->update($this->currentItemID, $this->data);
             if ($isUpdate) {
                 $this->itemUpdated();
-                $this->messages['updateItem'] = 'Item updated!';
+                $this->messages[__METHOD__] = ITEM_UPDATE_SUCCESS_MSG;
+                $this->setIntrusionPlaceValue();
             } else {
-                $errorInfo = $this->model->getLastPDOError()['2'];
-                $this->errors['updateItem'] = 'Item is not updated. Database Error: ' . $errorInfo['2'];
-                $this->messages['updateItem'] = 'Item not updated!';
+                $errorInfo = $this->model->getLastPDOError();
+                $this->errors[__METHOD__] =
+                    ITEM_UPDATE_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
+                $this->messages[__METHOD__] = ITEM_UPDATE_FAILURE_MSG;
                 $block = $this->render(
                     $this->modelName . '/update.php',
-                    [$this->itemName => $this->currentItem]
+                    [$this->itemName => $this->getCurrentItem()]
                 );
             }
         } else {
             $block = $this->render(
                 $this->modelName . '/update.php',
-                [$this->itemName => $this->currentItem]
+                [$this->itemName => $this->getCurrentItem()]
             );
-            $this->messages['updateItem'] = 'Item not updated!';
+            $this->messages[__METHOD__] = ITEM_UPDATE_FAILURE_MSG;
         }
         $this->renderResultPage(
             [$this->intrusionPlaceName => $this->intrusionPlaceValue,

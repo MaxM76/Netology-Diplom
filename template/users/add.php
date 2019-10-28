@@ -5,13 +5,8 @@
     <td>
       <select name="type">
 <?php foreach (USER_TYPES as $key => $value) : ?>
-        <?php if ($value == USER_CODE) {
-            $sel = 'selected ';
-        } else {
-            $sel = '';
-        }
-        ?>
-        <option <?= $sel ?>value="<?=$value?>"><?=$key?></option>
+    <?php $selectedAttribute = ($value == USER_CODE) ? 'selected ' : '';?>
+        <option <?= $selectedAttribute ?>value="<?=$value?>"><?=$key?></option>
 <?php endforeach ?>
       </select>
     </td>
@@ -20,8 +15,8 @@
     <td>
       <div class="user-ops-div">
         <ul class="user-ops-list">  
-          <li><a href="?c=users&a=add">Добавить</a></li>
-          <li><a href="?c=users&a=list">Отменить</a></li>
+          <li><a href="index.php?c=users&a=add">Добавить</a></li>
+          <li><a href="index.php?c=users&a=list">Отменить</a></li>
         </ul>
       </div>
     </td>         

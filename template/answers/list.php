@@ -2,7 +2,7 @@
   <div class="answers-list-section-wrapper">
     <div class="answers-list-nav-div">
       <p>
-        <a href="?c=questions&a=list&topic_id=<?= $topic_id?>">Закрыть</a>
+        <a href="index.php?c=questions&a=list&topic_id=<?= $topic_id?>#current-topic">Закрыть</a>
       </p>
     </div>
 <?php $isReplaceIntrusion = isset($intrusion['type']) && ($intrusion['type'] == 'replace'); ?>
@@ -28,8 +28,8 @@
             <div class="answers-list-ops-div">
             <?php if ($userType == ADMIN_CODE) : ?>
               <ul class="answers-list-ops-list">
-                <li><a href="?c=answers&a=delete&answer_id=<?= $answer['id']?>">Удалить</a></li>
-                <li><a href="?c=answers&a=item&answer_id=<?= $answer['id']?>">Изменить</a></li>
+                <li><a href="index.php?c=answers&a=delete&answer_id=<?= $answer['id']?>">Удалить</a></li>
+                <li><a href="index.php?c=answers&a=item&answer_id=<?= $answer['id']?>">Изменить</a></li>
               </ul>
             <?php endif;?>
             </div>
@@ -51,7 +51,7 @@
 
     <div class="answers-list-section-footer">
       <div class="answers-list-ops-div">
-        <p><a href="?c=answers&a=item&answer_id=-1&question_id=<?= $question['question_id']?>">Ответить</a></p>
+        <p><a href="index.php?c=answers&a=item&answer_id=-1&question_id=<?= $question['question_id']?>#new-answer">Ответить</a></p>
       </div>
     </div>
     <?php endif; ?>

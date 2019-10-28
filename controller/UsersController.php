@@ -10,7 +10,6 @@ use lh\classes\Application;
  */
 class UsersController extends PrimaryController
 {
-
     /**
      * UsersController constructor.
      * @param Application $application
@@ -76,14 +75,15 @@ class UsersController extends PrimaryController
      * @param string $name
      * @return bool
      */
-    public function getParamLogin($name)
+    protected function getParamLogin($name)
     {
         $success = false;
-        if (isset($_POST[$name]) && preg_match('/.{5,}/is', $_POST[$name])) {
+        echo '$name = '.$name.'<br>';
+        if (isset($_POST[$name]) && preg_match(LOGIN_REGEXP, $_POST[$name])) {
             $this->data[$name] = $_POST[$name];
             $success = true;
         } else {
-            $this->errors[$name] = 'Error in user login';
+            $this->errors[__METHOD__] = USER_LOGIN_ERR_MSG . LOGIN_REQUIREMENTS;
         }
         return $success;
     }
@@ -97,7 +97,7 @@ class UsersController extends PrimaryController
         if (isset($this->data['login'])) {
             $result = $this->model->isUserUnique($this->data['login'], $this->currentItemID);
         } else {
-            $this->errors['unique'] = 'User with entered login exist';
+            $this->errors[__METHOD__] = USER_EXIST_ERR_MSG;
         }
         return $result;
     }
@@ -109,11 +109,11 @@ class UsersController extends PrimaryController
     public function getParamMail($name)
     {
         $success = false;
-        if (isset($_POST[$name]) && preg_match('/.+@.+\..+/is', $_POST[$name])) {
+        if (isset($_POST[$name]) && preg_match(EMAIL_REGEXP, $_POST[$name])) {
             $this->data[$name] = $_POST[$name];
             $success = true;
         } else {
-            $this->errors[$name] = 'Error in user email';
+            $this->errors[__METHOD__] = USER_EMAIL_ERR_MSG;
         }
         return $success;
     }
@@ -125,11 +125,14 @@ class UsersController extends PrimaryController
     public function getParamPassword($name)
     {
         $success = false;
-        if (isset($_POST[$name]) && preg_match('/.{5,}/is', $_POST[$name])) {
+        if (isset($_POST[$name]) && preg_match(PASSWORD_REGEXP, $_POST[$name])) {
             $this->data[$name] = $_POST[$name];
             $success = true;
+        } elseif ($_POST['type'] == QUEST_CODE) {
+            $this->data[$name] = '';
+            $success = true;
         } else {
-            $this->errors[$name] = 'Error in user password';
+            $this->errors[__METHOD__] = USER_PASSWORD_ERR_MSG . PASSWORD_REQUIREMENTS;
         }
         return $success;
     }
@@ -146,7 +149,7 @@ class UsersController extends PrimaryController
         } else {
             $data[$name] = QUEST_CODE;
             $success = true;
-            $this->messages[$name] = 'Using default user type';
+            $this->messages[__METHOD__] = USER_DEFAULT_TYPE_MSG;
         }
         return $success;
     }
@@ -161,7 +164,7 @@ class UsersController extends PrimaryController
             $this->data['password'] = $_POST['password1'];
             $result = true;
         } else {
-            $this->errors['password'] = 'Error in user password';
+            $this->errors[__METHOD__] = USER_PASSWORDS_NOT_EQUAL_ERR_MSG;
         }
         return $result;
     }
@@ -189,22 +192,30 @@ class UsersController extends PrimaryController
             $user = $this->model->getUserByLogin($this->data['login']);
             if ($user['password'] === $this->data['password']) {
                 $_SESSION['user'] = $user;
+                if ($_SESSION['user']['type'] == ADMIN_CODE) {
+                    $_SESSION['filter'] = 'all';
+                } else {
+                    $_SESSION['filter'] = 'published';
+                }
                 header('Location: index.php');
             } else {
-                $this->errors['login'] = 'Password doesn\'t match user password';
+                $this->errors[__METHOD__] = WRONG_PASSWORD_ERR_MSG;
+                $this->messages[__METHOD__] = USER_LOGIN_FAILURE_MSG;
                 $block = $this->render(
                     $this->modelName . '/login.php',
                     [$this->itemName => $this->data]
                 );
             }
         } else {
-            $this->errors['input'] = 'Bad input';
+            $this->errors[__METHOD__] = LACK_DATA_FOR_LOGIN_ERR_MSG;
+            $this->messages[__METHOD__] = USER_LOGIN_FAILURE_MSG;
             $block = $this->render(
                 $this->modelName . '/login.php',
                 [$this->itemName => $this->data]
             );
         }
         $this->outputTemplate ='users/blank.php';
+        $this->messages[__METHOD__] = USER_LOGIN_FAILURE_MSG;
         $this->renderResultPage(
             [$this->intrusionPlaceName => '',
             'block' => $block,
@@ -226,7 +237,6 @@ class UsersController extends PrimaryController
      */
     public function register()
     {
-        $block = '';
         if ($this->getParamLogin('login') &&
             $this->isUserUnique() &&
             $this->getParamMail('email') &&
@@ -237,20 +247,23 @@ class UsersController extends PrimaryController
             $isRegistered = $this->model->add($this->data);
             if ($isRegistered) {
                 $this->userRegistered();
-                $this->messages['register'] = 'Registration successful';
+                $this->messages[__METHOD__] = USER_REGISTER_SUCCESS_MSG;
                 $block = $this->render(
                     $this->modelName . '/welcome.php',
                     [$this->itemName => $this->data]
                 );
             } else {
-                $errorInfo = $this->model->getLastPDOError()['2'];
-                $this->errors['register'] = 'User is not registered. Database Error: ' . $errorInfo['2'];
+                $errorInfo = $this->model->getLastPDOError();
+                $this->errors[__METHOD__] =
+                    USER_REGISTER_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
+                $this->messages[__METHOD__] = USER_REGISTER_FAILURE_MSG;
                 $block = $this->render(
                     $this->modelName . '/register.php',
                     [$this->itemName => $this->data]
                 );
             }
         } else {
+            $this->messages[__METHOD__] = USER_REGISTER_FAILURE_MSG;
             $block = $this->render(
                 $this->modelName . '/register.php',
                 [$this->itemName => $this->data]
@@ -264,14 +277,12 @@ class UsersController extends PrimaryController
         );
     }
 
-
     /**
      *
      */
     public function userRegistered()
     {
     }
-
 
     /**
      *
@@ -284,13 +295,9 @@ class UsersController extends PrimaryController
                     $block = $this->render('users/admin.php');
                     break;
                 case USER_CODE:
-                    $block = $this->render('topics/list.php');
-                    //$this->router->TopicsController->list();
-                    //$block =  $this->render('users/admin.php');
-                    break;
+                    header('Location: index.php?c=topics&a=list');
                 default: //'Гость'
                     $block = $this->render('topics/list.php');
-                    //$block =  $this->render('users/admin.php');
                     break;
             }
         } else {
@@ -310,7 +317,6 @@ class UsersController extends PrimaryController
     public function gotoLogin()
     {
         $block = $this->render('users/login.php');
-        $this->outputTemplate ='users/blank.php';
         $this->outputTemplate ='users/blank.php';
         $this->renderResultPage(
             [$this->intrusionPlaceName => '',

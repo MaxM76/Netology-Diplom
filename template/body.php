@@ -7,8 +7,8 @@
     echo $eblock;
     echo $mblock;
 ?>
-      </div> <!--  -->
-    </header> <!-- header -->
+      </div>
+    </header>
 
     <section class="main-section">
       <div class="main-section-wrapper">
@@ -16,11 +16,17 @@
     echo $oblock;
 ?>
       </div>
-    </section> <!-- nav-section -->
+    </section>
 
     <footer>
       <div class="footer-wrapper">
-        <p>© 2019  Максим Маркелов, по всем вопросам пишите по адресу m.v.markelov@mail.ru</p>
+        <p>
+          © 2019  Максим Маркелов, по всем вопросам пишите по адресу <a href="mailto:m.v.markelov@mail.ru">
+            m.v.markelov@mail.ru
+          </a>
+        </p>
+
+          </td>
       </div>
-    </footer> <!-- -->
+    </footer>
   </body>

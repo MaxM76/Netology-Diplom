@@ -20,6 +20,9 @@ class TopicsController extends PrimaryController
         parent::__construct($application);
         $this->intrusionPlaceName = 'topic_id';
         $this->outputTemplate ='topics/list.php';
+        // $this->addItemIntrusionType = 'replace';
+        $this->updateItemIntrusionType = 'insert';
+        $this->getItemIntrusionType = 'replace';
     }
 
     /**
@@ -36,7 +39,7 @@ class TopicsController extends PrimaryController
     /**
      * @return bool
      */
-    public function getDataset()
+    protected function getDataset()
     {
         return $this->model->getList();
     }
@@ -52,7 +55,7 @@ class TopicsController extends PrimaryController
     /**
      * @return array
      */
-    public function getEmptyItem()
+    protected function getEmptyItem()
     {
         return ['text' => '', 'description' => ''];
     }
@@ -60,8 +63,33 @@ class TopicsController extends PrimaryController
     /**
      * @return bool
      */
-    public function setInputData()
+    protected function setInputData()
     {
         return ($this->getParamSimple('text') && $this->getParamSimple('description'));
+    }
+
+    /**
+     *
+     */
+    public function getItem()
+    {
+        if ($this->isCurrentItemExist()) {
+            $block = $this->render(
+                $this->modelName . '/update.php',
+                [$this->itemName => $this->getCurrentItem()]
+            );
+        } else {
+            $block = $this->render(
+                $this->modelName . '/add.php',
+                [$this->itemName => $this->getEmptyItem()]
+            );
+        }
+        $this->renderResultPage(
+            [$this->intrusionPlaceName => $this->intrusionPlaceValue,
+                'block' => $block,
+                'type' => $this->getItemIntrusionType,
+                'hideUpdateTopicButton' => true,
+                'filter' => $this->getFilter()]
+        );
     }
 }

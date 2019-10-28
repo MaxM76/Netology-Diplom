@@ -1,10 +1,8 @@
-<?php $questionsItemAction = ($controller == 'questionsController') && ($action == 'item'); ?>
-<?php $answersItemAction = ($controller == 'answersController') && ($action == 'item'); ?>
-<?php $addQuestion = isset($intrusion['question_id'])
-    && ($intrusion['question_id'] == -1)
-    && ($intrusion['block'] != ''); ?>
-<?php $isInsertIntrusion = isset($intrusion['type']) && ($intrusion['type'] == 'insert')?>
-
+<?php $isIntrusionExist = isset($intrusion['block']) && ($intrusion['block'] != '');?>
+<?php $addQuestion = $isIntrusionExist
+    && isset($intrusion['question_id'])
+    && ($intrusion['question_id'] == UNKNOWN_ITEM_ID); ?>
+<?php $isReplaceIntrusion = $isIntrusionExist && isset($intrusion['type']) && ($intrusion['type'] == 'replace')?>
 <div class="questions-list-section">
   <div class="questions-list-section-wrapper">
     <div class="questions-list-section-header">
@@ -25,9 +23,18 @@
     <?php endif;?>                  
             <td>Операции</td>
           </tr>
+
     <?php foreach ($questions as $question) : ?>
-        <?php $intrusionHere = isset($intrusion['question_id']) && ($question['id'] == $intrusion['question_id']); ?>
-        <?php if (!($intrusionHere && !($isInsertIntrusion))) : ?>
+        <?php $intrusionHere = $isIntrusionExist
+                && isset($intrusion['question_id'])
+                && ($question['id'] == $intrusion['question_id']); ?>
+        <?php if ($intrusionHere) : ?>
+          <a name="current-question"></a>
+        <?php endif;?>
+
+        <?php if ($intrusionHere && $isReplaceIntrusion) : ?>
+            <?= $intrusion['block']?>
+        <?php else : ?>
           <tr class="questions-list-table-row">
             <td><?= $question['text']?></td>
             <td><?= $question['created_at']?></td>
@@ -36,70 +43,73 @@
               <a href="<?= $emailHref ?>"><?= $question['login']?></a>
             </td>
 
-            <?php if ($question['status'] == 1) : ?>
+            <?php if ($question['status'] == QUESTION_ANSWERED) : ?>
             <td>Отвечен</td>
             <?php else : ?>
             <td>Нет ответа</td>
             <?php endif;?>
 
             <?php if ($userType == ADMIN_CODE) : ?>
-                <?php if ($question['is_published'] == QUESTION_PUBLISHED) {
-                    $ch ='checked ';
-                } else {
-                    $ch ='';
-                } ?>
-
+                <?php $checkedAttribute = ($question['is_published'] == QUESTION_PUBLISHED) ? 'checked ' : '';?>
             <td>
-              <input type="checkbox" name="published" <?= $ch ?> disabled>
+              <input type="checkbox" name="is_published" <?= $checkedAttribute ?> disabled>
             </td>
-
-            <?php endif;?>     
+            <?php endif;?>
                 
             <td>
               <div class="questions-list-item-ops-div">
                 <ul class="question-list-ops-list">
             <?php if ($userType == ADMIN_CODE) : ?>
-                  <li><a href="?c=questions&a=delete&id=<?= $question['id']?>">Удалить</a></li>
-
-                <?php if (!($questionsItemAction && $intrusionHere)) : ?>
-                  <li><a href="?c=questions&a=item&id=<?= $question['id']?>">Редактировать</a></li>
+                  <li>
+                    <a href="index.php?c=questions&a=delete&id=<?= $question['id']?>&filter=<?= $filter?>#current-topic">
+                      Удалить
+                    </a>
+                  </li>
+                <?php if (!($intrusion['hideEditQuestionButton'] && $intrusionHere)) : ?>
+                  <li>
+                    <a href="index.php?c=questions&a=item&id=<?= $question['id']?>&filter=<?= $filter?>#current-question">
+                      Редактировать
+                    </a>
+                  </li>
                 <?php endif;?>
-
-            <?php endif;?>
+            <?php endif; ?>
                 
             <?php if ($question['status'] == QUESTION_ANSWERED) : ?>
-                <?php if ($intrusionHere) : ?>
+                <?php if ($intrusionHere && !$isReplaceIntrusion) : ?>
                   <li>
-                    <a href="?c=questions&a=list&topic_id=<?= $question['topic_id']?>">Скрыть ответ</a>
+                    <a href="index.php?c=questions&a=list&topic_id=<?= $question['topic_id']?>&filter=<?= $filter?>#current-question">
+                        Скрыть ответ
+                    </a>
                   </li>
                 <?php else : ?>
                   <li>
-                    <a href="?c=answers&a=list&question_id=<?= $question['id']?>">Показать ответ</a>
+                    <a href="index.php?c=answers&a=list&question_id=<?= $question['id']?>&filter=<?= $filter?>#current-question">
+                        Показать ответ
+                    </a>
+                  </li>
+                <?php endif; ?>
+            <?php else : ?>
+                <?php if (($userType == ADMIN_CODE)
+                        && ($question['status'] == QUESTION_NOT_ANSWERED)
+                        && !(!($intrusion['hideAnswerQuestionButton']) && $intrusionHere)) : ?>
+                  <li>
+                    <a href="index.php?c=answers&a=item&answer_id=-1&question_id=<?= $question['id']?>&filter=<?= $filter?>#new-answer">
+                       Ответить
+                    </a>
                   </li>
                 <?php endif;?>
             <?php endif;?>
-
-            <?php if (($userType == ADMIN_CODE)
-                && ($question['status'] == QUESTION_NOT_ANSWERED)
-                && !($answersItemAction && $intrusionHere)) : ?>
-                  <li>
-                    <a href="?c=answers&a=item&answer_id=-1&question_id=<?= $question['id']?>">Ответить</a>
-                  </li>
-            <?php endif;?>                            
-                           
                 </ul>                 
               </div>
             </td>
-          </tr>  
-           
-        <?php endif;?>
-            
-        <?php if ($intrusionHere) : ?>
-          <tr class="questions-list-table-row">  
+          </tr>
+            <?php if ($intrusionHere && !$isReplaceIntrusion) : ?>
+          <tr>
             <td colspan="6">
-            <?= $intrusion['block']?>
+                <?= $intrusion['block']?>
             </td>
           </tr>
+            <?php endif; ?>
         <?php endif;?>
     <?php endforeach; ?>
 
@@ -118,14 +128,16 @@
 
 <?php if ($addQuestion) : ?>
       <div class="questions-list-intrusion">
-    <?= $intrusion['block']?>      
+    <?= $intrusion['block']?>
       </div>
-
 <?php else : ?>
       <div class="questions-list-ops-div">
-        <p><a href="?c=questions&a=item&id=-1&topic_id=<?= $topic_id?>">Добавить вопрос</a></p>
+        <p>
+          <a href="index.php?c=questions&a=item&id=-1&topic_id=<?= $topic_id?>&filter=<?= $filter?>#new-question">
+            Добавить вопрос
+          </a>
+        </p>
       </div>
-
 <?php endif;?>
     </div>
   </div>

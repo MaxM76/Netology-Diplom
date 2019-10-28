@@ -2,13 +2,9 @@
 
 namespace lh\controller;
 
-//use lh\controller\PrimaryController;
 use lh\classes\Application;
 use lh\model\Questions;
 use lh\model\Topics;
-
-//require_once 'PrimaryController.php';
-//include 'model/questions.php';
 
 /**
  * Class QuestionsController
@@ -25,7 +21,7 @@ class QuestionsController extends TopicsController
     /**
      * @var int
      */
-    private $curTopicId = -1;
+    private $curTopicId = UNKNOWN_ITEM_ID;
 
     /**
      * QuestionsController constructor.
@@ -34,14 +30,11 @@ class QuestionsController extends TopicsController
     public function __construct(Application $application)
     {
         parent::__construct($application);
- 
         $this->intrusionPlaceName = 'question_id';
-
         $this->setCurrentTopicId();
-        
-        $this->addItemIntrusionType = 'replace';
+        // $this->addItemIntrusionType = 'replace';
         $this->updateItemIntrusionType = 'insert';
-        $this->getItemIntrusionType = 'insert';
+        $this->getItemIntrusionType = 'replace';
     }
 
     /**
@@ -67,13 +60,14 @@ class QuestionsController extends TopicsController
         } elseif ($this->currentItemID > 0) {
             $topicId = $this->model->getTopicId($this->currentItemID);
             $errorInfo = $this->model->getLastPDOError();
-            if ($errorInfo['0'] != 0) {
-                $this->errors['topic_id'] = 'No topic_id Info. Database Error: ' . $errorInfo['2'];
+            if ($errorInfo[PDO_ERROR_INFO_SQLSTATE_INDEX] != PDO_ERROR_INFO_NO_ERROR_CODE) {
+                $this->errors[__METHOD__] =
+                    TOPIC_ID_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
             } else {
                 $this->curTopicId = $topicId;
             }
         } else {
-            $this->errors['topic_id'] = 'Error in getting topic_id';
+            $this->errors[__METHOD__] = TOPIC_ID_ERR_MSG;
         }
     }
 
@@ -90,7 +84,11 @@ class QuestionsController extends TopicsController
      */
     public function getEmptyItem()
     {
-        return ['text' => '', 'topic_id' => $this->curTopicId, 'status' => 0, 'published' => 0];
+        return ['text' => '',
+            'topic_id' => $this->curTopicId,
+            'status' => QUESTION_NOT_ANSWERED,
+            'is_published' => QUESTION_NOT_PUBLISHED
+        ];
     }
 
     /**
@@ -98,60 +96,62 @@ class QuestionsController extends TopicsController
      */
     public function setInputData()
     {
-        $this->data['status'] = 0;
         return (
             $this->getParamSimple('text') &&
             $this->getParamNumeric('topic_id') &&
-            $this->getParamLogical('published')
+            $this->getParamLogical('is_published') &&
+            $this->getParamLogical('status')
         );
     }
 
     /**
      * @param array $intrusion
      */
-    public function renderResultPage($intrusion = []) //renderResultPage
+    public function renderResultPage($intrusion = [])
     {
         $this->getQuestionsList($intrusion);
         
         parent::renderResultPage(
             ['topic_id' => $this->curTopicId,
             'block' => $this->outputBlock,
-            'type' => 'insert']
+            'type' => 'insert',
+            'filter' => $this->getFilter()
+            ]
         );
     }
 
     /**
      * @param array $intrusion
      */
-    public function getQuestionsList($intrusion = [])
+    private function getQuestionsList($intrusion = [])
     {
-        if ($this->curTopicId != -1) {
-            if (isset($_SESSION['user']['type']) &&
-                    $_SESSION['user']['type'] == ADMIN_CODE) {
-                if (isset($_GET['filter'])) {
-                    switch ($_GET['filter']) {
-                        case "unanswered":
-                            $questionsList = $this->model->getUnansweredList($this->curTopicId);
-                            break;
-                        case "unpublished":
-                            $questionsList = $this->model->getUnpublishedList($this->curTopicId);
-                            break;
-                    }
-                } else {
+        $questionsList =[];
+        if ($this->curTopicId != UNKNOWN_ITEM_ID) {
+            switch ($this->getFilter()) {
+                case "all":
                     $questionsList = $this->model->getList($this->curTopicId);
-                }
-            } else {
-                $questionsList = $this->model->getPublishedList($this->curTopicId);
+                    break;
+                case "unanswered":
+                    $questionsList = $this->model->getUnansweredList($this->curTopicId);
+                    break;
+                case "unpublished":
+                    $questionsList = $this->model->getUnpublishedList($this->curTopicId);
+                    break;
+                case "published":
+                default:
+                    $questionsList = $this->model->getPublishedList($this->curTopicId);
+                    break;
             }
             $this->outputBlock = $this->render(
                 $this->modelName . '/list.php',
                 ['topic_id' => $this->curTopicId,
                 'questions' => $questionsList,
-                'intrusion' => $intrusion]
+                'intrusion' => $intrusion,
+                'filter' => $this->getFilter()]
             );
         } else {
-            $this->errors['topic_id'] = 'Error in Questions topic_id';
-            $this->messages['getQuestionsList'] = 'Unable to get Questions list';
+            $this->errors[__METHOD__] = TOPIC_ID_OF_QUESTION_ERR_MSG;
+            $this->messages[__METHOD__] = QUESTIONS_LIST_FAILURE_MSG;
         }
     }
 
@@ -164,19 +164,22 @@ class QuestionsController extends TopicsController
             $block = $this->render(
                 $this->modelName . '/update.php',
                 [$this->itemName => $this->getCurrentItem(),
-                'topics' => $this->getDataset()]  //'topics' - new
+                'topics' => $this->getDataset(),
+                'filter' => $this->getFilter()]
             );
         } else {
             $block = $this->render(
                 $this->modelName . '/add.php',
-                [$this->itemName => $this->getEmptyItem()]
+                [$this->itemName => $this->getEmptyItem(),
+                'filter' => $this->getFilter()]
             );
         }
         
         $this->renderResultPage(
             [$this->intrusionPlaceName => $this->intrusionPlaceValue,
             'block' => $block,
-            'type' => $this->getItemIntrusionType]
+            'type' => $this->getItemIntrusionType,
+            'hideEditQuestionButton' => true]
         );
     }
 
@@ -187,22 +190,23 @@ class QuestionsController extends TopicsController
     {
         if (!(isset($_SESSION['user']['email']))) {
             if (isset($_GET['login'])
-                    && preg_match('/.{5,}/is', $_GET['login'])
+                    && preg_match(LOGIN_REGEXP, $_GET['login'])
                     && isset($_GET['email'])
-                    && preg_match('/.+@.+\..+/is', $_GET['email'])) {
+                    && preg_match(EMAIL_REGEXP, $_GET['email'])) {
                 $data['login'] = $_GET['login'];
                 $data['email'] = $_GET['email'];
                 $data['type'] = USER_CODE;
                 $data['password'] ='';
                 $user = $this->users->getUserByLogin($data['login']);
-                if ($this->users->isUserUnique($data['login'], -1)
+                if ($this->users->isUserUnique($data['login'], UNKNOWN_ITEM_ID)
                         && ($user['email'] != $data['email'])) {
                     if ($this->users->add($data)) {
                         $_SESSION['user'] = $this->users->getUserByLogin($data['login']);
                         $this->application->addActionButton('logout');
                     } else {
                         $errorInfo = $this->users->getLastPDOError();
-                        $this->errors['addItem'] = 'Item not added. Database Error: ' . $errorInfo['2'];
+                        $this->errors[__METHOD__] =
+                            ITEM_ADD_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
                     }
                 }
             }
@@ -220,24 +224,25 @@ class QuestionsController extends TopicsController
             $isUpdate = $this->model->update($this->currentItemID, $this->data);
             if ($isUpdate) {
                 $this->itemUpdated();
-                $this->messages['updateItem'] = 'Item updated!';
+                $this->messages[__METHOD__] = ITEM_UPDATE_SUCCESS_MSG;
             } else {
-                $errorInfo = $this->model->getLastPDOError()['2'];
-                $this->errors['updateItem'] = 'Topic not updated. Database Error: ' . $errorInfo['2'];
-                $this->messages['updateItem'] = 'Item not updated!';
+                $errorInfo = $this->model->getLastPDOError();
+                $this->errors[__METHOD__] =
+                    ITEM_UPDATE_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
+                $this->messages[__METHOD__] = ITEM_UPDATE_FAILURE_MSG;
                 $block = $this->render(
                     $this->modelName . '/update.php',
-                    [$this->itemName => $this->currentItem,
-                    'topics' => $this->getDataset()]  //'topics' - new
+                    [$this->itemName => $this->getCurrentItem(),
+                    'topics' => $this->getDataset()]
                 );
             }
         } else {
             $block = $this->render(
                 $this->modelName . '/update.php',
-                [$this->itemName => $this->currentItem,
-                'topics' => $this->getDataset()]  //'topics' - new
+                [$this->itemName => $this->getCurrentItem(),
+                'topics' => $this->getDataset()]
             );
-            $this->messages['updateItem'] = 'Item not updated!';
+            $this->messages[__METHOD__] = ITEM_UPDATE_FAILURE_MSG;
         }
         $this->renderResultPage(
             [$this->intrusionPlaceName => $this->intrusionPlaceValue,

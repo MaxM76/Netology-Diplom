@@ -1,3 +1,9 @@
+<?php $isIntrusionExist = isset($intrusion['block']) && ($intrusion['block'] != '');?>
+<?php $addUser = $isIntrusionExist
+    && isset($intrusion['user_id'])
+    && ($intrusion['user_id'] == UNKNOWN_ITEM_ID); ?>
+<?php $isInsertIntrusion = $isIntrusionExist && isset($intrusion['type']) && ($intrusion['type'] == 'insert'); ?>
+<?php $isReplaceIntrusion = $isIntrusionExist && isset($intrusion['type']) && ($intrusion['type'] == 'replace')?>
 <div class="users-list-section">
   <div class="users-list-section-wrapper">
     <div class="users-list-section-header">
@@ -15,10 +21,14 @@
         </tr>
 
 <?php foreach ($users as $user) : ?>
-    <?php if ((isset($intrusion['user_id']) && ($user['id'] != $intrusion['user_id']))
-            || (isset($intrusion['type']) && ($intrusion['type'] == 'insert'))
-            || !(isset($intrusion['user_id']))) : ?>
-        <!--[c] слишком сложная конструкция, проверка бы куда-то на уровень контроллера убрать, либо скрыть за какой-то фукнцией -->
+
+    <?php $intrusionHere = $isIntrusionExist
+        && isset($intrusion['user_id'])
+        && ($user['id'] == $intrusion['user_id']); ?>
+
+    <?php if ($intrusionHere && $isReplaceIntrusion) : ?>
+        <?= $intrusion['block']?>
+    <?php else : ?>
         <tr>
           <td><?= $user['login']?></td>
           <td><?= $user['password']?></td>
@@ -27,8 +37,8 @@
           <td>
             <div class="user-ops-div">
               <ul class="user-ops-list">  
-                <li><a href="?c=users&a=delete&id=<?= $user['id']?>">Удалить</a></li>
-                <li><a href="?c=users&a=item&id=<?= $user['id']?>">Изменить</a></li>
+                <li><a href="index.php?c=users&a=delete&id=<?= $user['id']?>">Удалить</a></li>
+                <li><a href="index.php?c=users&a=item&id=<?= $user['id']?>">Изменить</a></li>
               </ul>
             </div>
           </td>         
@@ -37,22 +47,19 @@
                
     <?php endif;?>
 
-    <?php if (isset($intrusion['user_id']) && ($user['id'] == $intrusion['user_id'])) : ?>
-        <?= $intrusion['block'] ?>
-    <?php endif;?> 
-
 <?php endforeach; ?>
 
-<?php if (isset($intrusion['user_id']) && ($intrusion['user_id'] == -1) && ($intrusion['block'] != '')) : ?>
+<?php if ($addUser) : ?>
     <?= $intrusion['block'] ?>
 <?php endif;?>
 
       </table>
+
     </div>  
 
     <div class="users-list-section-footer">
       <div class="users-list-ops-div">  
-        <p><a href="?c=users&a=item&id=-1">Добавить пользователя</a></p>
+        <p><a href="index.php?c=users&a=item&id=-1">Добавить пользователя</a></p>
       </div>
     </div>
   </div>

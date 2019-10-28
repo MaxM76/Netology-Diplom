@@ -26,12 +26,12 @@ class AnswersController extends TopicsController
     /**
      * @var int
      */
-    protected $curTopicId = -1;
+    protected $curTopicId = UNKNOWN_ITEM_ID;
 
     /**
      * @var int
      */
-    protected $curQuestionId = -1;
+    protected $curQuestionId = UNKNOWN_ITEM_ID;
 
     /**
      * AnswersController constructor.
@@ -45,6 +45,7 @@ class AnswersController extends TopicsController
         $this->setCurrentTopicId();
         $this->addItemIntrusionType = 'insert';
         $this->updateItemIntrusionType = 'insert';
+        $this->getItemIntrusionType = 'replace';
     }
 
     /**
@@ -85,15 +86,16 @@ class AnswersController extends TopicsController
         } elseif ($this->currentItemID > 0) {
             $questionId = $this->model->getQuestionId($this->currentItemID);
             $errorInfo = $this->model->getLastPDOError();
-            if ($errorInfo['0'] != 0) {
-                $this->errors['question_id'] = 'No question_id Info. Database Error: ' . $errorInfo['2'];
+            if ($errorInfo[PDO_ERROR_INFO_SQLSTATE_INDEX] != PDO_ERROR_INFO_NO_ERROR_CODE) {
+                $this->errors[__METHOD__] =
+                    QUESTION_ID_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
             } else {
                 $this->curQuestionId = $questionId;
                 $this->setIntrusionPlaceValue($this->curQuestionId);
                 $this->data['question_id'] = $this->curQuestionId;
             }
         } else {
-            $this->errors['question_id'] = 'Error in getting question_id';
+            $this->errors[__METHOD__] = QUESTION_ID_ERR_MSG;
         }
     }
 
@@ -107,13 +109,14 @@ class AnswersController extends TopicsController
         } elseif ($this->curQuestionId > 0) {
             $topicId = $this->questions->getTopicId($this->curQuestionId);
             $errorInfo = $this->questions->getLastPDOError();
-            if ($errorInfo['0'] != 0) {
-                $this->errors['topic_id'] = 'No topic_id Info. Database Error: ' . $errorInfo['2'];
+            if ($errorInfo[PDO_ERROR_INFO_SQLSTATE_INDEX] != PDO_ERROR_INFO_NO_ERROR_CODE) {
+                $this->errors[__METHOD__] =
+                    TOPIC_ID_DB_ERR_MSG . $errorInfo[PDO_ERROR_INFO_MSG_INDEX];
             } else {
                 $this->curTopicId = $topicId;
             }
         } else {
-            $this->errors['topic_id'] = 'Error in getting topic_id';
+            $this->errors[__METHOD__] = TOPIC_ID_ERR_MSG;
         }
     }
 
@@ -136,7 +139,8 @@ class AnswersController extends TopicsController
         $this->renderResultPage(
             [$this->intrusionPlaceName => $this->intrusionPlaceValue,
                 'block' => $block,
-                'type' => $this->getItemIntrusionType]
+                'type' => $this->getItemIntrusionType,
+                'hideAnswerQuestionButton' => false]
         );
     }
 
@@ -170,23 +174,42 @@ class AnswersController extends TopicsController
     public function renderResultPage($intrusion = [])
     {
         $this->getAnswersList($intrusion);
-
+        switch ($this->getFilter()) {
+            case "all":
+                $questionsList = $this->questions->getList($this->curTopicId);
+                break;
+            case "unanswered":
+                $questionsList = $this->questions->getUnansweredList($this->curTopicId);
+                break;
+            case "unpublished":
+                $questionsList = $this->questions->getUnpublishedList($this->curTopicId);
+                break;
+            case "published":
+            default:
+                $questionsList = $this->questions->getPublishedList($this->curTopicId);
+                break;
+        }
         $this->outputBlock = $this->render(
             'questions/list.php',
             [
-                'questions' => $this->questions->getList($this->curTopicId),
+                'questions' => $questionsList,
+                'filter' => $this->getFilter(),
                 'intrusion' =>
                 [
                     'question_id' => $this->curQuestionId,
                     'block' => $this->outputBlock,
-                    'type' => 'insert'
+                    'type' => 'insert',
+                    'hideAnswerQuestionButton' => $intrusion['hideAnswerQuestionButton']
                 ]
             ]
         );
         parent::renderResultPage(
-            ['topic_id' => $this->curTopicId,
-            'block' => $this->outputBlock,
-            'type' => 'replace']
+            [
+                'topic_id' => $this->curTopicId,
+                'block' => $this->outputBlock,
+                'type' => 'insert',
+                'filter' => $this->getFilter()
+            ]
         );
     }
 
@@ -195,7 +218,7 @@ class AnswersController extends TopicsController
      */
     public function getAnswersList($intrusion = [])
     {
-        if ($this->curQuestionId != -1) {
+        if ($this->curQuestionId != UNKNOWN_ITEM_ID) {
             $this->outputBlock = $this->render(
                 $this->modelName . '/list.php',
                 ['question' => $this->questions->getItem($this->curQuestionId),
@@ -204,8 +227,8 @@ class AnswersController extends TopicsController
                 'intrusion' => $intrusion]
             );
         } else {
-            $this->errors['getAnswersList'] = 'Error in Answers question_id';
-            $this->messages['getAnswersList'] = 'Unable to get Answers list';
+            $this->errors[__METHOD__] = QUESTION_ID_OF_ANSWER_ERR_MSG;
+            $this->messages[__METHOD__] = ANSWERS_LIST_FAILURE_MSG;
         }
     }
 

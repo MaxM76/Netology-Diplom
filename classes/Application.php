@@ -11,6 +11,9 @@ namespace lh\classes;
 use lh\controller\PrimaryController;
 use lh\controller\UsersController;
 
+include 'Consts/consts.php';
+include 'Consts/messages.php';
+
 /**
  * Class Application
  * @package lh\classes
@@ -61,11 +64,11 @@ class Application
     }
 
     /**
-     * Метод подсоединят базу данных. В случае неудачи бросает исключение PDOException
+     * Метод подсоединяет базу данных. В случае неудачи бросает исключение PDOException
      * @return void
      * @throws \PDOException
      */
-    protected function connectDb()
+    private function connectDb()
     {
         $config = $this->configDb();
         try {
@@ -103,7 +106,7 @@ class Application
     /**
      * Метод инициализирует навигационные кнопки в зависимости от типа пользователя
      */
-    public function initActionButtons()
+    private function initActionButtons()
     {
         switch ($this->userType) {
             case ADMIN_CODE:
@@ -122,7 +125,7 @@ class Application
     }
 
     /**
-     * @param array $actionButton
+     * @param string $actionButton
      */
     public function addActionButton($actionButton)
     {
@@ -132,7 +135,7 @@ class Application
     }
 
     /**
-     * @param array $actionButton
+     * @param string $actionButton
      */
     public function removeActionButton($actionButton)
     {
@@ -171,8 +174,6 @@ class Application
         if (method_exists($this->controller, $this->router->method)) {
             $method = $this->router->method;
             $this->controller->$method(); // вызывает метод объекта-контроллера
-        } else {
-            //$this->controller->$method(); // error page
         }
     }
 }

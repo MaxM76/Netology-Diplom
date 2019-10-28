@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Maxim
- * Date: 24.08.2019
- * Time: 21:25
- */
 
 namespace lh\model;
 
@@ -90,7 +84,7 @@ class Model
      * @param int $ownerId
      * @return bool
      */
-    public function getList($ownerId = -1)
+    public function getList($ownerId = UNKNOWN_ITEM_ID)
     {
         return false;
     }

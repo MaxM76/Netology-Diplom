@@ -1,10 +1,11 @@
 <div class="question-list-section-add">
+  <a name="new-question"></a>
   <div class="question-add-wrapper">  
     <div class="question-add-nav-div">
-      <p><a href="?c=questions&a=list&topic_id=<?= $question['topic_id'] ?>">Закрыть</a></p>    
+      <p><a href="index.php?c=questions&a=list&topic_id=<?= $question['topic_id'] ?>#current-topic">Закрыть</a></p>
     </div>
-    
-    <form class="question-add-form" action="" method="get">
+
+    <form class="question-add-form" action="index.php#current-topic" method="get">
       <input type="hidden" name="c" value="questions">
       <input type="hidden" name="a" value="add">
       <input type="hidden" name="topic_id" value="<?= $question['topic_id'] ?>">

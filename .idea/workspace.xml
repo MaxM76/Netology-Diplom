@@ -2,41 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44abb98d-06d3-40aa-84b8-1ccb518d6387" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Consts/messages.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/localhost.zip" afterPath="$PROJECT_DIR$/localhost.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Consts/consts.php" afterPath="$PROJECT_DIR$/Consts/consts.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/Application.php" afterPath="$PROJECT_DIR$/classes/Application.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/Router.php" afterPath="$PROJECT_DIR$/classes/Router.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller/AnswersController.php" afterPath="$PROJECT_DIR$/controller/AnswersController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller/PrimaryController.php" afterPath="$PROJECT_DIR$/controller/PrimaryController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller/QuestionsController.php" afterPath="$PROJECT_DIR$/controller/QuestionsController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller/TopicsController.php" afterPath="$PROJECT_DIR$/controller/TopicsController.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller/UsersController.php" afterPath="$PROJECT_DIR$/controller/UsersController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/styles.css" afterPath="$PROJECT_DIR$/css/styles.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/Answers.php" afterPath="$PROJECT_DIR$/model/Answers.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/Model.php" afterPath="$PROJECT_DIR$/model/Model.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/Questions.php" afterPath="$PROJECT_DIR$/model/Questions.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/Topics.php" afterPath="$PROJECT_DIR$/model/Topics.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/Users.php" afterPath="$PROJECT_DIR$/model/Users.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/answers/add.php" afterPath="$PROJECT_DIR$/template/answers/add.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/answers/list.php" afterPath="$PROJECT_DIR$/template/answers/list.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/body.php" afterPath="$PROJECT_DIR$/template/body.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/errors.php" afterPath="$PROJECT_DIR$/template/errors.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/messages.php" afterPath="$PROJECT_DIR$/template/messages.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/questions/add.php" afterPath="$PROJECT_DIR$/template/questions/add.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/questions/list.php" afterPath="$PROJECT_DIR$/template/questions/list.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/questions/update.php" afterPath="$PROJECT_DIR$/template/questions/update.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/topics/add.php" afterPath="$PROJECT_DIR$/template/topics/add.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/topics/list.php" afterPath="$PROJECT_DIR$/template/topics/list.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/topics/update.php" afterPath="$PROJECT_DIR$/template/topics/update.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/add.php" afterPath="$PROJECT_DIR$/template/users/add.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/admin.php" afterPath="$PROJECT_DIR$/template/users/admin.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/list.php" afterPath="$PROJECT_DIR$/template/users/list.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/login.php" afterPath="$PROJECT_DIR$/template/users/login.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/register.php" afterPath="$PROJECT_DIR$/template/users/register.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/update.php" afterPath="$PROJECT_DIR$/template/users/update.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/template/users/welcome.php" afterPath="$PROJECT_DIR$/template/users/welcome.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -250,14 +217,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>'</find>
-      <find>'checked</find>
-      <find>'checked'</find>
-      <find>published</find>
       <find>ITEM_DEFAULT_VALUE_MSG</find>
       <find>getParamLogical</find>
       <find>__CLASS__ . '::' . __METHOD__</find>
-      <find>$</find>
       <find>$_</find>
       <find>$_S</find>
       <find>$_SESSION</find>
@@ -278,8 +240,13 @@
       <find>action</find>
       <find>h</find>
       <find>href</find>
-      <find>new_question</find>
       <find>status</find>
+      <find>new_question</find>
+      <find>$</find>
+      <find>$na</find>
+      <find>$nam</find>
+      <find>$name</find>
+      <find>'$name</find>
     </findStrings>
     <replaceStrings>
       <replace>$topic['id']</replace>
@@ -811,12 +778,12 @@
       <workItem from="1563988443536" duration="48575000" />
       <workItem from="1566068131263" duration="152160000" />
       <workItem from="1567512215852" duration="25539000" />
-      <workItem from="1569826467340" duration="165609000" />
+      <workItem from="1569826467340" duration="166314000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="391883000" />
+    <option name="totallyTimeSpent" value="392588000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">

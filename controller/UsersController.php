@@ -78,7 +78,6 @@ class UsersController extends PrimaryController
     protected function getParamLogin($name)
     {
         $success = false;
-        echo '$name = '.$name.'<br>';
         if (isset($_POST[$name]) && preg_match(LOGIN_REGEXP, $_POST[$name])) {
             $this->data[$name] = $_POST[$name];
             $success = true;

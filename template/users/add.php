@@ -1,3 +1,4 @@
+<form action="index.php?c=users&a=add" method="post">
   <tr>
     <td><input type="text" name="login" value=""></td>
     <td><input type="text" name="password" value=""></td>
@@ -15,10 +16,11 @@
     <td>
       <div class="user-ops-div">
         <ul class="user-ops-list">  
-          <li><a href="index.php?c=users&a=add">Добавить</a></li>
+          <li><input class=user-update-button type="submit" value="Добавить"></li>
           <li><a href="index.php?c=users&a=list">Отменить</a></li>
         </ul>
       </div>
     </td>         
            
   </tr>
+</form>
